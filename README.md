@@ -12,6 +12,12 @@
  > Java -> piva vai ver oq ele vai fazer com isso <br>
  > JavaScript -> Animações e tals <br>
 
+## Tecnologias <br>
+ > HTML5
+ > CSS3
+ > Python -> caminho para o db e flask para as rotas (Se precisar)
+ > Java -> piva vai ver oq ele vai fazer com isso
+ > JavaScript -> Animações e tals
 
 
 
@@ -24,9 +30,7 @@
 
 
 
-
-
-
+primeiro commit piva
 
 primeiro commit joão
 
