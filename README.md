@@ -1,11 +1,11 @@
 ### Visa-final
 
-## Informações importantes
+## Informações importantes <br>
  > não dar git add . (só fazer se for pouca coisa)
  > entrar e sair das pastas com cd e cd..
  > sempre dar git pull antes de fazer algo, para evitar conflitos e tals
 
-## Tecnologias
+## Tecnologias <br>
  > HTML5
  > CSS3
  > Python -> caminho para o db e flask para as rotas (Se precisar)
