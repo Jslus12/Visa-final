@@ -1,26 +1,23 @@
-### Visa-final
+#### Visa-final
 
-## Informações importantes <br>
+### Informações importantes <br>
  > não dar git add . (só fazer se for pouca coisa) <br>
  > entrar e sair das pastas com cd e cd.. <br>
  > sempre dar git pull antes de fazer algo, para evitar conflitos e tals <br>
 
-## Tecnologias <br>
+### Tecnologias <br>
  > HTML5 <br>
  > CSS3 <br>
  > Python -> caminho para o db e flask para as rotas (Se precisar) <br>
  > Java -> piva vai ver oq ele vai fazer com isso <br>
+ > SpringBoot <br>
  > JavaScript -> Animações e tals <br>
-
-## Tecnologias <br>
- > HTML5
- > CSS3
- > Python -> caminho para o db e flask para as rotas (Se precisar)
- > Java -> piva vai ver oq ele vai fazer com isso
- > JavaScript -> Animações e tals
-
-
-
+ > Banco de Dados -> Railway ou SupaBase <br>
+ 
+### Funções de cada um vai ter: <br>
+    > Japoneis | Piva | Ana -> Back-End e Banco de dados 
+    > Yasmin -> Front-End 
+    > Jão e Rafa -> Flex (Ajudando todos na medida do possível) 
 
 
 
