@@ -3,21 +3,35 @@
 ### Informações importantes <br>
  > não dar git add . (só fazer se for pouca coisa) <br>
  > entrar e sair das pastas com cd e cd.. <br>
+  - cd e o nome da pasta para entrar <br>
+  - cd.. para voltar a pasta anterior <br>
  > sempre dar git pull antes de fazer algo, para evitar conflitos e tals <br>
 
 ### Tecnologias <br>
- > HTML5 <br>
- > CSS3 <br>
- > Python -> caminho para o db e flask para as rotas (Se precisar) <br>
- > Java -> piva vai ver oq ele vai fazer com isso <br>
- > SpringBoot <br>
- > JavaScript -> Animações e tals <br>
- > Banco de Dados -> Railway ou SupaBase <br>
+ # Front-End <br>
+  - HTML5 <br>
+  - CSS3 <br>
+  - JavaScript -> Animações e tals <br>
+  - SpringBoot <br>
+
+ # Back-End <br>
+  - Python -> caminho para o db e flask para as rotas (Se precisar) <br>
+  - Java -> piva vai ver oq ele vai fazer com isso <br>
+  - SpringBoot <br>
+  - Banco de Dados -> Railway ou SupaBase <br>
  
 ### Funções de cada um vai ter: <br>
-    > Japoneis | Piva | Ana -> Back-End e Banco de dados 
-    > Yasmin -> Front-End 
-    > Jão e Rafa -> Flex (Ajudando todos na medida do possível) 
+ # Desenvolvimento Back-End e Banco de Dados
+    > Japoneis
+    > Piva
+    > Ana 
+
+ # Desenvolvimento Front-End
+    > Yasmin
+
+ # Flex
+    > Jão
+    > Rafa 
 
 
 
