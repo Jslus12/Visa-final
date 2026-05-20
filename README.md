@@ -1,4 +1,4 @@
-#### Visa-final
+### Visa-final
 
 ### Informações importantes <br>
   - não dar git add . (só fazer se for pouca coisa) <br>
@@ -7,7 +7,7 @@
   - cd.. para voltar a pasta anterior <br>
   - sempre dar git pull antes de fazer algo, para evitar conflitos e tals <br>
 
-### Tecnologias <br>
+## Tecnologias <br>
  # Front-End <br>
   - HTML5 <br>
   - CSS3 <br>
@@ -20,8 +20,8 @@
   - SpringBoot <br>
   - Banco de Dados -> Railway ou SupaBase <br>
  
-### Funções de cada um vai ter: <br>
- # Desenvolvimento Back-End e Banco de Dados
+## Funções de cada um vai ter: <br>
+  # Desenvolvimento Back-End e Banco de Dados
     > Japoneis
     > Piva
     > Ana 
