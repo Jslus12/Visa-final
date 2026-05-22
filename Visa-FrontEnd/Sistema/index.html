@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vigilância Sanitária — Licenciamento Sanitário Digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ══════════════ ROLE SWITCHER ══════════════ -->
+<div id="role-switcher">
+  <div class="rs-bg"></div>
+  <div class="rs-grid"></div>
+
+  <div class="rs-content">
+    <div class="rs-brand">
+      <div class="rs-brand-icon">
+        <svg viewBox="0 0 32 32" fill="none"><path d="M16 3L4 9.5v13L16 29l12-6.5v-13L16 3z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><path d="M16 3v26M4 9.5l12 6.5 12-6.5" stroke="white" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="rs-brand-text">
+        <div class="rs-brand-name">Vigilância Sanitária</div>
+        <div class="rs-brand-sub">Licenciamento Sanitário Digital · Protótipo</div>
+      </div>
+    </div>
+
+    <!-- STEP 1: perfil -->
+    <div id="role-cards-step" class="rs-step">
+      <div class="rs-step-label">Selecione seu perfil para continuar</div>
+      <div class="rs-cards">
+        <div class="role-card" id="card-user" onclick="showLogin('user')">
+          <div class="rc-glow"></div>
+          <div class="rc-header">
+            <div class="rc-icon-wrap user">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="rc-badge">Acesso público</div>
+          </div>
+          <div class="rc-title">Usuário / Solicitante</div>
+          <div class="rc-desc">Enviar documentos, acompanhar processos e receber notificações sanitárias.</div>
+          <div class="rc-arrow">Entrar <span>→</span></div>
+        </div>
+        <div class="role-card analyst" id="card-analyst" onclick="showLogin('analyst')">
+          <div class="rc-glow analyst-glow"></div>
+          <div class="rc-header">
+            <div class="rc-icon-wrap analyst">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <div class="rc-badge analyst-badge">Acesso restrito</div>
+          </div>
+          <div class="rc-title">Analista Sanitário</div>
+          <div class="rc-desc">Revisar documentação, aprovar licenças e gerenciar vistorias de campo.</div>
+          <div class="rc-arrow">Entrar <span>→</span></div>
+        </div>
+      </div>
+      <div class="rs-footer-note">
+        <svg viewBox="0 0 16 16" fill="currentColor" width="12"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3.5a.75.75 0 110 1.5.75.75 0 010-1.5zM7.25 7h1.5v4h-1.5z"/></svg>
+        Sistema em ambiente de demonstração. Dados fictícios.
+      </div>
+    </div>
+
+    <!-- STEP 2: login -->
+    <div id="login-panel" class="rs-step">
+      <div class="login-box">
+        <button class="login-back" onclick="backToCards()">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="14"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
+          Voltar
+        </button>
+        <div class="login-profile" id="login-profile-bar">
+          <div class="login-profile-icon" id="login-icon"></div>
+          <div>
+            <div class="login-role-title" id="login-title"></div>
+            <div class="login-role-sub" id="login-sub"></div>
+          </div>
+        </div>
+        <div class="login-divider"></div>
+        <div class="login-field">
+          <label class="login-label">E-mail institucional</label>
+          <div class="login-input-wrap">
+            <svg class="login-input-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+            <input class="login-input" id="login-email" type="email" placeholder="seu@email.com" onkeydown="if(event.key==='Enter')document.getElementById('login-senha').focus()">
+          </div>
+        </div>
+        <div class="login-field">
+          <label class="login-label">Senha de acesso</label>
+          <div class="login-input-wrap">
+            <svg class="login-input-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+            <input class="login-input" id="login-senha" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+          </div>
+        </div>
+        <div class="login-error" id="login-error"></div>
+        <button class="login-btn" onclick="doLogin()">
+          <span>Acessar o sistema</span>
+          <svg viewBox="0 0 20 20" fill="currentColor" width="16"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+        </button>
+        <div class="login-demo-hint">
+          <div class="login-demo-label">Credenciais de demonstração</div>
+          <code id="hint-cred"></code>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MAIN APP ══════════════ -->
+<div id="app">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="header-logo-icon">
+        <svg viewBox="0 0 32 32" fill="none"><path d="M16 3L4 9.5v13L16 29l12-6.5v-13L16 3z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><path d="M16 3v26M4 9.5l12 6.5 12-6.5" stroke="white" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <div class="header-title">VigilânciaNet</div>
+        <div class="header-sub" id="header-sub">Portal de Envio</div>
+      </div>
+    </div>
+    <div class="header-center" id="header-info">Portal do Solicitante</div>
+    <div class="header-right">
+      <div class="header-user-block">
+        <div class="header-avatar" id="header-avatar">US</div>
+        <div class="header-user-info">
+          <div class="header-username" id="header-username">Usuário</div>
+          <span class="header-role-badge badge-user" id="header-badge">Solicitante</span>
+        </div>
+      </div>
+      <button class="switch-btn" onclick="switchRole()">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="14"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/></svg>
+        Trocar perfil
+      </button>
+    </div>
+  </header>
+
+  <div class="app-body">
+    <nav class="sidebar" id="sidebar"></nav>
+    <main class="content" id="content"></main>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toast-icon"></span>
+  <span id="toast-msg"></span>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal" id="modal-inner"></div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

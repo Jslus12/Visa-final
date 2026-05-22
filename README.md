@@ -47,7 +47,7 @@ Por fim, o projeto na qual estamos mostrando atualmente, é a versão final do p
 
   <tr>
     <td align="center">Ana Giulia</td>
-    <td align="center">Responsável pelo Banco de Dados</td>
+    <td align="center">Responsável pelo FrontEnd</td>
   </tr>
 
   <tr>
