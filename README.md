@@ -48,10 +48,8 @@ Por fim, o projeto na qual estamos mostrando atualmente, é a versão final do p
   </tr>
 </table>
 
----
-
 <div align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Cormorant+Garamond&weight=300&size=42&duration=3500&pause=1200&color=F0EDE6&center=true&vCenter=true&width=00&lines=TECNOLOGIAS+APLICADAS" />
+  <img src="https://readme-typing-svg.herokuapp.com?font=Cormorant+Garamond&weight=300&size=42&duration=3500&pause=1200&color=F0EDE6&center=true&vCenter=true&width=700&lines=TECNOLOGIAS+USADAS"/>
 </div>
 
 ```
@@ -82,24 +80,4 @@ SUPABASE
   - Java -> piva vai ver oq ele vai fazer com isso <br>
   - SpringBoot <br>
   - Banco de Dados -> Railway ou SupaBase <br>
- 
-## Funções de cada um vai ter: <br>
-  # Desenvolvimento Back-End e Banco de Dados
-    > Japoneis
-    > Piva
-    > Ana 
 
- # Desenvolvimento Front-End
-    > Yasmin
-    > João
-
- # Flex
-    > Rafa 
-
-primeiro commit piva
-
-primeiro commit joão teste 2
-
-Primeiro Commit Japoneis teste 2
-
-Primeiro Commit RafaaPia
