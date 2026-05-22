@@ -72,7 +72,7 @@ Por fim, o projeto na qual estamos mostrando atualmente, é a versão final do p
 
   <tr>
     <td align="center">Yasmin Fernanda</td>
-    <td align="center">Responsável FrontEnd</td>
+    <td align="center">Responsável pelo FrontEnd</td>
   </tr>
 </table>
 
