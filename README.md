@@ -33,17 +33,9 @@
     > Jão
     > Rafa 
 
-
-
-
-
-
-
-
-
 primeiro commit piva
 
-primeiro commit joão
+primeiro commit joão teste 2
 
 Primeiro Commit Japoneis teste 2
 
