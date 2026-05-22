@@ -28,9 +28,9 @@
 
  # Desenvolvimento Front-End
     > Yasmin
+    > João
 
  # Flex
-    > Jão
     > Rafa 
 
 primeiro commit piva
