@@ -48,18 +48,25 @@ Por fim, o projeto na qual estamos mostrando atualmente, é a versão final do p
   </tr>
 </table>
 
+---
+
 <div align="center">
   <img src="https://readme-typing-svg.herokuapp.com?font=Cormorant+Garamond&weight=300&size=42&duration=3500&pause=1200&color=F0EDE6&center=true&vCenter=true&width=700&lines=TECNOLOGIAS+USADAS"/>
 </div>
 
-```
-HTML5
-CSS3
-JS
-PYTHON
-SUPABASE
-```
----
+<p align="center">
+  <img src="https://img.shields.io/badge/HTML5-000000?style=for-the-badge&logo=html5&logoColor=white" />
+  <img src="https://img.shields.io/badge/CSS3-000000?style=for-the-badge&logo=css3&logoColor=white" />
+  <img src="https://img.shields.io/badge/JavaScript-000000?style=for-the-badge&logo=javascript&logoColor=white" />
+  <img src="https://img.shields.io/badge/Python-000000?style=for-the-badge&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/Supabase-000000?style=for-the-badge&logo=supabase&logoColor=white" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/VS_Code-000000?style=for-the-badge&logo=visual-studio-code&logoColor=white" />
+  <img src="https://img.shields.io/badge/GitHub-000000?style=for-the-badge&logo=github&logoColor=white" />
+</p>
+
 
 ### Informações importantes <br>
   - não dar git add . (só fazer se for pouca coisa) <br>
