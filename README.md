@@ -43,7 +43,6 @@ Por fim, o projeto na qual estamos mostrando atualmente, é a versão final do p
   <tr>
     <th> Nome</th>
     <th> Função</th>
-    <th>Redes Sociais</th>
   </tr>
 
   <tr>
