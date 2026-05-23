@@ -191,6 +191,11 @@ function renderAnalystProcesses() {
           <option value="">Todos os status</option>
           <option>Pendente</option><option>Em análise</option><option>Aprovado</option><option>Com erro</option><option>Ag. correção</option>
         </select>
+        <div style="margin-left:auto">
+        <input type="file" id="file-upload" style="display:none" accept=".pdf,.jpg,.png" onchange="handleFileUpload(this)">
+        <button class="btn btn-primary" onclick="document.getElementById('file-upload').click()">
+        ${iconUpload()} Anexar Documento
+        </button>
       </div>
     </div>
     <div class="card">
@@ -227,6 +232,14 @@ function filterTable(search, status) {
     const matchStatus = !_statusVal || r.dataset.status === _statusVal;
     r.style.display = matchSearch && matchStatus ? '' : 'none';
   });
+}
+
+function handleFileUpload(input) {
+  const file = input.files[0];
+  if (file) {
+    showToast(`Documento "${file.name}" anexado com sucesso!`, 'success', '📎');
+    input.value = '';
+  }
 }
 
 function renderAnalystVistorias() {
