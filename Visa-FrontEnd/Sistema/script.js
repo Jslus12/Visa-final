@@ -1,15 +1,11 @@
 'use strict';
 
 /* ══════════════════════════════════════════════
-   VIGILÂNCIANET — Application Logic
+   VIGILÂNCIANET — Application Logic (Analista only)
 ══════════════════════════════════════════════ */
-
-let currentRole = null;
-let pendingRole = null;
 
 // ── Credentials ──
 const CREDENTIALS = {
-  user:    { email: 'usuario@empresa.com',    senha: '123456' },
   analyst: { email: 'analista@vigilancia.pr', senha: '123456' },
 };
 
@@ -22,50 +18,16 @@ const processes = [
   { id: '#2026-00127', empresa: 'Farmácia Vida',           cnpj: '77.888.999/0001-38', status: 'Aprovado',     ia: 'Válida',   data: '12/04/2026', analista: 'Dra. Carla M.', tipo: 'Alvará Sanitário', docs: { alvara:'ok',  tecnico:'ok',   licenca:'ok'  }, obs: '' },
 ];
 
-// ── Default notifications ──
-const DEFAULT_NOTIFS = [
-  { id:1, icon:'✅', title:'Processo aprovado',   msg:'Processo #2026-00123 (Restaurante Sabor Ltda) foi aprovado. Seu alvará está disponível para download.', time:'08/04/2026 14:22', type:'success', read:true,  proto:'#2026-00123' },
-  { id:2, icon:'⚠️', title:'Correção necessária', msg:'Processo #2026-00125: Alvará anterior com data de validade expirada. Faça a correção para prosseguir.', time:'10/04/2026 09:15', type:'warn',    read:false, proto:'#2026-00125' },
-  { id:3, icon:'🔍', title:'Processo em análise', msg:'Seu protocolo #2026-00124 foi recebido e está em análise pelo analista Dr. Bruno R.', time:'09/04/2026 11:03', type:'info', read:true,  proto:'#2026-00124' },
-  { id:4, icon:'📅', title:'Vistoria agendada',   msg:'Uma vistoria foi agendada para o processo #2026-00126 em 22/04/2026 às 10:30.', time:'11/04/2026 16:45', type:'info',    read:false, proto:'#2026-00126' },
-];
-
 
 /* ══════════════════════════════════════════════
    LOGIN FLOW
 ══════════════════════════════════════════════ */
 
-function showLogin(role) {
-  pendingRole = role;
-  document.getElementById('role-cards-step').style.display = 'none';
-  const panel = document.getElementById('login-panel');
-  panel.classList.add('visible');
-
-  const isUser = role === 'user';
-  document.getElementById('login-icon').textContent  = isUser ? '🏢' : '🔎';
-  document.getElementById('login-title').textContent = isUser ? 'Usuário / Solicitante' : 'Analista Sanitário';
-  document.getElementById('login-sub').textContent   = isUser ? 'Portal de envio de processos' : 'Painel de análise e aprovação';
-  document.getElementById('hint-cred').textContent   = `${CREDENTIALS[role].email} / ${CREDENTIALS[role].senha}`;
-
-  document.getElementById('login-email').value = '';
-  document.getElementById('login-senha').value = '';
-  document.getElementById('login-error').textContent = '';
-  ['login-email','login-senha'].forEach(id => document.getElementById(id).classList.remove('input-error'));
-
-  setTimeout(() => document.getElementById('login-email').focus(), 60);
-}
-
-function backToCards() {
-  pendingRole = null;
-  document.getElementById('login-panel').classList.remove('visible');
-  document.getElementById('role-cards-step').style.display = '';
-}
-
 function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   const senha = document.getElementById('login-senha').value;
   const err   = document.getElementById('login-error');
-  const cred  = CREDENTIALS[pendingRole];
+  const cred  = CREDENTIALS.analyst;
 
   ['login-email','login-senha'].forEach(id => document.getElementById(id).classList.remove('input-error'));
   err.textContent = '';
@@ -82,7 +44,7 @@ function doLogin() {
     document.getElementById('login-senha').classList.add('input-error');
     return;
   }
-  setRole(pendingRole);
+  setRole();
 }
 
 
@@ -90,32 +52,24 @@ function doLogin() {
    APP SETUP
 ══════════════════════════════════════════════ */
 
-function setRole(role) {
-  currentRole = role;
+function setRole() {
   document.getElementById('role-switcher').style.display = 'none';
   document.getElementById('app').classList.add('visible');
-  if (!window._userNotifs) window._userNotifs = JSON.parse(JSON.stringify(DEFAULT_NOTIFS));
   renderApp();
 }
 
 function switchRole() {
   document.getElementById('role-switcher').style.display = '';
   document.getElementById('app').classList.remove('visible');
-  document.getElementById('login-panel').classList.remove('visible');
-  document.getElementById('role-cards-step').style.display = '';
-  currentRole = null; pendingRole = null;
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-senha').value = '';
+  document.getElementById('login-error').textContent = '';
+  ['login-email','login-senha'].forEach(id => document.getElementById(id).classList.remove('input-error'));
 }
 
 function renderApp() {
-  const isUser = currentRole === 'user';
-  document.getElementById('header-sub').textContent      = isUser ? 'Portal de Envio' : 'Painel do Analista';
-  document.getElementById('header-info').textContent     = isUser ? 'Sistema de Licenciamento Sanitário' : 'Vigilância Sanitária — Painel de Controle';
-  document.getElementById('header-avatar').textContent   = isUser ? 'US' : 'CM';
-  document.getElementById('header-username').textContent = isUser ? 'João Solicitante' : 'Dra. Carla Mendes';
-  document.getElementById('header-badge').textContent    = isUser ? 'Solicitante' : 'Analista';
-  document.getElementById('header-badge').className      = 'header-role-badge ' + (isUser ? 'badge-user' : 'badge-analyst');
   renderSidebar();
-  isUser ? renderUserHome() : renderAnalystDashboard();
+  renderAnalystDashboard();
 }
 
 
@@ -124,26 +78,19 @@ function renderApp() {
 ══════════════════════════════════════════════ */
 
 function renderSidebar() {
-  const isUser = currentRole === 'user';
-  const items = isUser ? [
-    { icon: iconHome(),     label: 'Início',          page: 'user-home',       active: true },
-    { icon: iconSend(),     label: 'Novo Protocolo',  page: 'user-new' },
-    { icon: iconList(),     label: 'Meus Processos',  page: 'user-processes' },
-    { icon: iconBell(),     label: 'Notificações',    page: 'user-notif', badge: () => unreadCount() },
-  ] : [
-    { icon: iconHome(),     label: 'Dashboard',       page: 'analyst-dashboard', active: true },
-    { icon: iconList(),     label: 'Processos',       page: 'analyst-processes', badge: '3' },
-    { icon: iconCalendar(), label: 'Vistorias',       page: 'analyst-vistorias' },
-    { icon: iconChart(),    label: 'Relatórios',      page: 'analyst-reports' },
-    { icon: iconGear(),     label: 'Configurações',   page: 'analyst-config' },
+  const items = [
+    { icon: iconHome(),     label: 'Dashboard',     page: 'analyst-dashboard', active: true },
+    { icon: iconList(),     label: 'Processos',     page: 'analyst-processes', badge: '3' },
+    { icon: iconCalendar(), label: 'Vistorias',     page: 'analyst-vistorias' },
+    { icon: iconChart(),    label: 'Relatórios',    page: 'analyst-reports' },
+    { icon: iconGear(),     label: 'Configurações', page: 'analyst-config' },
   ];
 
   let html = `<div class="sidebar-section"><div class="sidebar-label">Menu principal</div>`;
-  items.forEach((item, i) => {
-    const badgeVal = typeof item.badge === 'function' ? item.badge() : item.badge;
+  items.forEach(item => {
     html += `<button class="nav-item${item.active ? ' active' : ''}" data-page="${item.page}" onclick="navTo('${item.page}',this)">
       ${item.icon} ${item.label}
-      ${badgeVal ? `<span class="nav-badge">${badgeVal}</span>` : ''}
+      ${item.badge ? `<span class="nav-badge">${item.badge}</span>` : ''}
     </button>`;
   });
   html += '</div>';
@@ -154,412 +101,13 @@ function navTo(page, btn) {
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   const pages = {
-    'user-home':           renderUserHome,
-    'user-new':            renderUserNew,
-    'user-processes':      renderUserProcesses,
-    'user-notif':          renderUserNotif,
-    'analyst-dashboard':   renderAnalystDashboard,
-    'analyst-processes':   renderAnalystProcesses,
-    'analyst-vistorias':   renderAnalystVistorias,
-    'analyst-reports':     renderAnalystReports,
-    'analyst-config':      renderAnalystConfig,
+    'analyst-dashboard':  renderAnalystDashboard,
+    'analyst-processes':  renderAnalystProcesses,
+    'analyst-vistorias':  renderAnalystVistorias,
+    'analyst-reports':    renderAnalystReports,
+    'analyst-config':     renderAnalystConfig,
   };
   if (pages[page]) pages[page]();
-}
-
-function unreadCount() {
-  return (window._userNotifs || []).filter(n => !n.read).length || '';
-}
-
-
-/* ══════════════════════════════════════════════
-   USER PAGES
-══════════════════════════════════════════════ */
-
-function renderUserHome() {
-  document.getElementById('content').innerHTML = `
-    <div class="page-header">
-      <div class="page-title">Bem-vindo, João 👋</div>
-      <div class="page-sub">Acompanhe seus processos e envie documentos para análise sanitária.</div>
-    </div>
-
-    <div class="metrics" style="grid-template-columns:repeat(3,1fr)">
-      <div class="metric blue">
-        <div class="metric-label">Total enviados</div>
-        <div class="metric-value">3</div>
-        <div class="metric-sub">desde jan/2026</div>
-      </div>
-      <div class="metric amber">
-        <div class="metric-label">Em análise</div>
-        <div class="metric-value">1</div>
-        <div class="metric-sub">aguardando revisão</div>
-      </div>
-      <div class="metric green">
-        <div class="metric-label">Aprovados</div>
-        <div class="metric-value">1</div>
-        <div class="metric-sub">documentos válidos</div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-bottom:16px">
-      <div class="card-header">
-        <div>
-          <div class="card-title">${iconList()} Meus Processos</div>
-          <div class="card-sub">Últimas atualizações</div>
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="navTo('user-new',null)">${iconSend()} Novo Protocolo</button>
-      </div>
-      <div class="card-body" style="padding:0">
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Protocolo</th><th>Tipo</th><th>Data</th><th>Status</th><th>Ação</th></tr></thead>
-            <tbody>
-              <tr>
-                <td><code class="proto">#2026-00123</code></td>
-                <td>Alvará Sanitário</td><td>08/04/2026</td>
-                <td>${statusBadge('Aprovado')}</td>
-                <td><button class="btn btn-ghost btn-sm" onclick="openProcessDetail(0)">Ver detalhes</button></td>
-              </tr>
-              <tr>
-                <td><code class="proto">#2026-00125</code></td>
-                <td>Novo processo</td><td>10/04/2026</td>
-                <td>${statusBadge('Com erro')}</td>
-                <td><button class="btn btn-ghost btn-sm" onclick="openProcessDetail(2)">Corrigir</button></td>
-              </tr>
-              <tr>
-                <td><code class="proto">#2026-00124</code></td>
-                <td>Renovação</td><td>09/04/2026</td>
-                <td>${statusBadge('Em análise')}</td>
-                <td><button class="btn btn-ghost btn-sm" onclick="openProcessDetail(1)">Acompanhar</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div class="flag info">
-      ${iconInfo()} <div><strong>Dica:</strong> Clique em <strong>Novo Protocolo</strong> para simular o envio completo com validação por IA.</div>
-    </div>
-  `;
-}
-
-// ── New protocol ──
-function renderUserNew() {
-  window._uploads = {};
-  document.getElementById('content').innerHTML = `
-    <div class="page-header">
-      <div class="page-title">Novo Protocolo</div>
-      <div class="page-sub">Preencha os dados e envie os documentos para análise sanitária.</div>
-    </div>
-
-    <div class="card" style="margin-bottom:16px">
-      <div class="card-header"><div class="card-title">${iconUser()} Dados do Solicitante</div></div>
-      <div class="card-body">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Nome da Empresa <span class="required">*</span></label>
-            <input class="form-input" placeholder="Ex: Restaurante Sabor Ltda" id="nome-empresa">
-          </div>
-          <div class="form-group">
-            <label class="form-label">CNPJ <span class="required">*</span></label>
-            <input class="form-input" placeholder="00.000.000/0000-00" id="cnpj" oninput="maskCNPJ(this)">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Responsável Técnico <span class="required">*</span></label>
-            <input class="form-input" placeholder="Nome completo" id="resp-tec">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Tipo de Processo <span class="required">*</span></label>
-            <select class="form-select" id="tipo-proc">
-              <option value="">Selecione...</option>
-              <option>Alvará Sanitário</option>
-              <option>Renovação</option>
-              <option>Novo processo</option>
-              <option>Segunda via</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Telefone</label>
-            <input class="form-input" placeholder="(43) 99999-0000">
-          </div>
-          <div class="form-group">
-            <label class="form-label">E-mail</label>
-            <input class="form-input" placeholder="empresa@email.com">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-bottom:16px">
-      <div class="card-header"><div class="card-title">${iconUpload()} Upload de Documentos</div></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
-        ${uploadZone('alvara',  '📄', 'Alvará Anterior',    'PDF, máx. 5MB')}
-        ${uploadZone('tecnico', '📋', 'Documento Técnico',  'PDF, máx. 5MB')}
-        ${uploadZone('licenca', '🏥', 'Licença Sanitária',  'PDF, máx. 5MB')}
-      </div>
-    </div>
-
-    <div class="card" id="ai-validation-card" style="margin-bottom:16px;display:none">
-      <div class="card-header">
-        <div class="card-title" style="display:flex;align-items:center;gap:8px">
-          ${iconAI()} Validação Automática por IA
-          <span id="ai-loading" style="display:none">
-            <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
-          </span>
-        </div>
-      </div>
-      <div class="card-body" id="ai-results"></div>
-    </div>
-
-    <div class="card" style="margin-bottom:16px">
-      <div class="card-header"><div class="card-title">📍 Acompanhamento do Processo</div></div>
-      <div class="card-body">
-        <div class="track">
-          <div class="track-step"><div class="track-circle active" id="tc1">1</div><div class="track-label">Enviado</div></div>
-          <div class="track-line" id="tl1"></div>
-          <div class="track-step"><div class="track-circle wait" id="tc2">2</div><div class="track-label">Em Análise</div></div>
-          <div class="track-line" id="tl2"></div>
-          <div class="track-step"><div class="track-circle wait" id="tc3">⚠</div><div class="track-label">Ag. Correção</div></div>
-          <div class="track-line" id="tl3"></div>
-          <div class="track-step"><div class="track-circle wait" id="tc4">📅</div><div class="track-label">Vistoria</div></div>
-          <div class="track-line" id="tl4"></div>
-          <div class="track-step"><div class="track-circle wait" id="tc5">✓</div><div class="track-label">Aprovado</div></div>
-        </div>
-      </div>
-    </div>
-
-    <div style="display:flex;gap:12px;justify-content:flex-end;padding-bottom:8px">
-      <button class="btn btn-ghost" onclick="renderUserHome()">Cancelar</button>
-      <button class="btn btn-primary" onclick="submitProcess()">${iconSend()} Enviar para Análise</button>
-    </div>
-  `;
-}
-
-function uploadZone(type, emoji, label, hint) {
-  return `<div class="upload-zone" id="zone-${type}">
-    <input type="file" accept=".pdf" onchange="handleFileInput(event,'${type}')">
-    <div class="upload-info">
-      <div class="upload-icon doc">${emoji}</div>
-      <div><div class="upload-name">${label}</div><div class="upload-hint">${hint}</div></div>
-    </div>
-    <button class="btn btn-ghost btn-sm" type="button" onclick="event.stopPropagation()">${iconUpload()} Selecionar</button>
-  </div>`;
-}
-
-function handleFileInput(e, type) {
-  e.stopPropagation();
-  const file = e.target.files[0];
-  if (!file) return;
-  window._uploads = window._uploads || {};
-  window._uploads[type] = file;
-  const zone = document.getElementById('zone-' + type);
-  zone.classList.add('has-file');
-  zone.querySelector('.upload-info').innerHTML = `
-    <div class="upload-icon ok">✅</div>
-    <div><div class="upload-name">${file.name}</div><div class="upload-hint">${(file.size / 1024).toFixed(0)} KB · Enviado</div></div>
-  `;
-  zone.querySelector('button').innerHTML = '✓ Carregado';
-  runAIValidation();
-}
-
-function runAIValidation() {
-  const card = document.getElementById('ai-validation-card');
-  card.style.display = '';
-  document.getElementById('ai-loading').style.display = '';
-  document.getElementById('ai-results').innerHTML = '<div style="color:var(--gray-400);font-size:13px;padding:4px 0">Analisando documentos com IA…</div>';
-
-  setTimeout(() => {
-    const ups = window._uploads || {};
-    document.getElementById('ai-loading').style.display = 'none';
-    let rows = '';
-    if (ups.alvara)  rows += aiRow('ok',   'Alvará Anterior',   'Documento identificado e válido. Validade verificada: dez/2026.');
-    else             rows += aiRow('warn',  'Alvará Anterior',   'Documento não enviado ainda.');
-    if (ups.tecnico) rows += aiRow('warn',  'Documento Técnico', 'Campo "Responsável" está incompleto ou ilegível.');
-    else             rows += aiRow('warn',  'Documento Técnico', 'Documento não enviado ainda.');
-    if (ups.licenca) rows += aiRow('ok',    'Licença Sanitária', 'Documento válido, sem inconsistências detectadas.');
-    else             rows += aiRow('error', 'Licença Sanitária', 'Documento obrigatório não enviado.');
-    document.getElementById('ai-results').innerHTML = `
-      <div class="ai-box">
-        <div class="ai-header">${iconAI()} <span class="ai-title">Resultado da Validação Automática</span></div>
-        ${rows}
-      </div>
-    `;
-  }, 1800);
-}
-
-function aiRow(type, label, msg) {
-  const cls  = type === 'ok' ? 'ok-item' : type === 'error' ? 'error-item' : 'warn';
-  const icon = type === 'ok' ? iconCheckGreen() : type === 'error' ? iconX() : iconWarn();
-  return `<div class="ai-item ${cls}">${icon} <div><strong>${label}</strong> — ${msg}</div></div>`;
-}
-
-function submitProcess() {
-  const nome = document.getElementById('nome-empresa')?.value.trim();
-  const cnpj = document.getElementById('cnpj')?.value.trim();
-  if (!nome || !cnpj) { showToast('Preencha os campos obrigatórios.', 'error-t', '⚠️'); return; }
-  showToast('Protocolo #2026-00128 enviado com sucesso!', 'success', '✅');
-  setTimeout(() => {
-    ['tc1','tc2'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.className = 'track-circle done';
-    });
-    const tl = document.getElementById('tl1');
-    if (tl) tl.classList.add('done');
-  }, 500);
-}
-
-// ── My processes ──
-function renderUserProcesses() {
-  document.getElementById('content').innerHTML = `
-    <div class="page-header">
-      <div class="page-title">Meus Processos</div>
-      <div class="page-sub">Histórico completo de solicitações.</div>
-    </div>
-    <div class="card">
-      <div class="card-body" style="padding:0">
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Protocolo</th><th>Empresa</th><th>Tipo</th><th>Data</th><th>Status</th><th>IA</th><th>Ação</th></tr></thead>
-            <tbody>
-              ${processes.map((p, i) => `<tr>
-                <td><code class="proto">${p.id}</code></td>
-                <td>${p.empresa}</td>
-                <td>${p.tipo}</td>
-                <td>${p.data}</td>
-                <td>${statusBadge(p.status)}</td>
-                <td>${iaBadge(p.ia)}</td>
-                <td><button class="btn btn-ghost btn-sm" onclick="openProcessDetail(${i})">Ver</button></td>
-              </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// ── Notifications ──
-function renderUserNotif() {
-  if (!window._userNotifs) window._userNotifs = JSON.parse(JSON.stringify(DEFAULT_NOTIFS));
-  const notifs = window._userNotifs;
-  const unread = notifs.filter(n => !n.read).length;
-
-  document.getElementById('content').innerHTML = `
-    <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between">
-      <div>
-        <div class="page-title">Notificações ${unread > 0 ? `<span style="font-size:14px;background:var(--red);color:white;border-radius:20px;padding:2px 10px;vertical-align:middle;margin-left:4px">${unread}</span>` : ''}</div>
-        <div class="page-sub">Atualizações sobre seus processos.</div>
-      </div>
-      <button class="btn btn-ghost btn-sm" onclick="markAllRead()">Marcar todas como lidas</button>
-    </div>
-
-    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap" id="notif-filters">
-      <button class="btn btn-primary btn-sm" style="border-radius:20px" onclick="filterNotifs('all',this)">Todas</button>
-      <button class="btn btn-ghost btn-sm"   style="border-radius:20px" onclick="filterNotifs('unread',this)">Não lidas</button>
-      <button class="btn btn-ghost btn-sm"   style="border-radius:20px" onclick="filterNotifs('success',this)">✅ Aprovadas</button>
-      <button class="btn btn-ghost btn-sm"   style="border-radius:20px" onclick="filterNotifs('warn',this)">⚠️ Correções</button>
-      <button class="btn btn-ghost btn-sm"   style="border-radius:20px" onclick="filterNotifs('info',this)">🔍 Informativas</button>
-    </div>
-
-    <div id="notif-list" style="display:flex;flex-direction:column;gap:10px">
-      ${notifs.map(n => renderNotifCard(n)).join('')}
-    </div>
-
-    <div style="margin-top:24px">
-      <div class="card">
-        <div class="card-header"><div class="card-title">📧 Preferências de Notificação</div></div>
-        <div class="card-body">
-          <div style="display:flex;flex-direction:column;gap:0">
-            ${[
-              { label:'Processo aprovado',   sub:'Receber e-mail quando aprovado',              on:true  },
-              { label:'Correção necessária', sub:'Receber e-mail quando solicitada uma correção', on:true  },
-              { label:'Processo em análise', sub:'Receber e-mail ao iniciar a revisão',           on:false },
-              { label:'Vistoria agendada',   sub:'Receber e-mail ao marcar vistoria',             on:true  },
-            ].map((p, i) => `
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--gray-50)">
-                <div>
-                  <div style="font-size:13px;font-weight:600;color:var(--gray-800)">${p.label}</div>
-                  <div style="font-size:12px;color:var(--gray-400);margin-top:2px">${p.sub}</div>
-                </div>
-                <div class="toggle-track ${p.on ? 'on' : ''}" onclick="togglePref(this)" role="switch" aria-checked="${p.on}">
-                  <div class="toggle-thumb"></div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-          <div style="margin-top:18px">
-            <label class="form-label">E-mail para notificações</label>
-            <div style="display:flex;gap:8px">
-              <input class="form-input" value="empresa@email.com" style="flex:1">
-              <button class="btn btn-primary" onclick="showToast('E-mail atualizado!','success','✅')">Salvar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function renderNotifCard(n) {
-  const unreadClass = !n.read ? `unread type-${n.type}` : '';
-  return `<div id="notif-${n.id}" data-type="${n.type}" data-read="${n.read}"
-    class="notif-card ${unreadClass}">
-    <span style="font-size:22px;flex-shrink:0;margin-top:2px">${n.icon}</span>
-    <div style="flex:1;min-width:0">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-        <span style="font-size:13px;font-weight:700;color:var(--gray-900)">${n.title}</span>
-        ${!n.read ? '<span style="width:7px;height:7px;border-radius:50%;background:var(--brand);flex-shrink:0"></span>' : ''}
-        <span style="font-size:11px;color:var(--gray-400);margin-left:auto">${n.time}</span>
-      </div>
-      <div style="font-size:13px;color:var(--gray-600);line-height:1.55">${n.msg}</div>
-      <div style="margin-top:10px;display:flex;gap:8px">
-        <button class="btn btn-ghost btn-sm" onclick="openProcessFromNotif('${n.proto}')">Ver processo</button>
-        ${!n.read ? `<button class="btn btn-ghost btn-sm" onclick="markOneRead(${n.id})">Marcar como lida</button>` : ''}
-      </div>
-    </div>
-  </div>`;
-}
-
-function markAllRead() {
-  (window._userNotifs || []).forEach(n => n.read = true);
-  showToast('Todas as notificações marcadas como lidas.', 'success', '✅');
-  renderUserNotif(); updateNotifBadge();
-}
-function markOneRead(id) {
-  const n = (window._userNotifs || []).find(x => x.id === id);
-  if (n) n.read = true;
-  renderUserNotif(); updateNotifBadge();
-}
-function filterNotifs(type, btn) {
-  document.querySelectorAll('#notif-filters button').forEach(b => { b.className = 'btn btn-ghost btn-sm'; b.style.borderRadius = '20px'; });
-  btn.className = 'btn btn-primary btn-sm'; btn.style.borderRadius = '20px';
-  document.querySelectorAll('#notif-list .notif-card').forEach(el => {
-    if (type === 'all')    el.style.display = '';
-    else if (type === 'unread') el.style.display = el.dataset.read === 'false' ? '' : 'none';
-    else el.style.display = el.dataset.type === type ? '' : 'none';
-  });
-}
-function togglePref(el) {
-  el.classList.toggle('on');
-  showToast('Preferência salva!', 'success', '✅');
-}
-function updateNotifBadge() {
-  const cnt = unreadCount();
-  const badge = document.querySelector('.nav-item[data-page="user-notif"] .nav-badge');
-  if (badge) badge.textContent = cnt || '';
-}
-function openProcessFromNotif(proto) {
-  const idx = processes.findIndex(p => p.id === proto);
-  if (idx >= 0) openProcessDetail(idx);
-}
-function pushUserNotif(notif) {
-  if (!window._userNotifs) window._userNotifs = [];
-  window._userNotifs.unshift(notif);
 }
 
 
@@ -806,7 +354,6 @@ function renderAnalystReports() {
 }
 
 function drawReportCharts(byStatus) {
-  // Donut chart
   const c1 = document.getElementById('chart-status');
   if (!c1) return;
   const ctx1 = c1.getContext('2d');
@@ -840,7 +387,6 @@ function drawReportCharts(byStatus) {
       </div>`).join('');
   }
 
-  // Bar chart
   const c2 = document.getElementById('chart-monthly');
   if (!c2) return;
   const ctx2 = c2.getContext('2d');
@@ -913,52 +459,6 @@ function renderAnalystConfig() {
    MODALS
 ══════════════════════════════════════════════ */
 
-function openProcessDetail(idx) {
-  const p = processes[idx];
-  document.getElementById('modal-inner').innerHTML = `
-    <div class="modal-header">
-      <div class="modal-title">Processo <code class="proto">${p.id}</code></div>
-      <button class="modal-close" onclick="closeModal()">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="detail-panel">
-        <div>
-          <div class="detail-label">Informações</div>
-          <div class="detail-row"><span class="detail-key">Empresa</span><span class="detail-val">${p.empresa}</span></div>
-          <div class="detail-row"><span class="detail-key">CNPJ</span><span class="detail-val" style="font-family:'JetBrains Mono',monospace;font-size:12px">${p.cnpj}</span></div>
-          <div class="detail-row"><span class="detail-key">Tipo</span><span class="detail-val">${p.tipo}</span></div>
-          <div class="detail-row"><span class="detail-key">Data de envio</span><span class="detail-val">${p.data}</span></div>
-          <div class="detail-row"><span class="detail-key">Status</span><span class="detail-val">${statusBadge(p.status)}</span></div>
-        </div>
-        <div>
-          <div class="detail-label">Documentos Enviados</div>
-          <div class="detail-row"><span class="detail-key">Alvará Anterior</span><span class="detail-val">${docChip(p.docs.alvara)}</span></div>
-          <div class="detail-row"><span class="detail-key">Doc. Técnico</span><span class="detail-val">${docChip(p.docs.tecnico)}</span></div>
-          <div class="detail-row"><span class="detail-key">Licença Sanitária</span><span class="detail-val">${docChip(p.docs.licenca)}</span></div>
-          <div class="detail-row"><span class="detail-key">Validação IA</span><span class="detail-val">${iaBadge(p.ia)}</span></div>
-        </div>
-      </div>
-      ${p.obs ? `<div style="margin-top:20px"><div class="detail-label">Observações do Analista</div><div class="flag warn" style="margin-top:8px">${iconWarn()} ${p.obs}</div></div>` : ''}
-      <div style="margin-top:20px">
-        <div class="detail-label">Acompanhamento</div>
-        <div class="track" style="margin:14px 0">
-          ${trackStep('done',  '✓', 'Enviado')}
-          ${trackLine(['Em análise','Ag. correção','Aprovado'].includes(p.status))}
-          ${trackStep(p.status === 'Em análise' ? 'active' : ['Ag. correção','Aprovado'].includes(p.status) ? 'done' : 'wait', '2', 'Em Análise')}
-          ${trackLine(['Ag. correção','Aprovado'].includes(p.status))}
-          ${trackStep(p.status === 'Ag. correção' ? 'alert' : p.status === 'Aprovado' ? 'done' : 'wait', '⚠', 'Correção')}
-          ${trackLine(p.status === 'Aprovado')}
-          ${trackStep('wait', '📅', 'Vistoria')}
-          ${trackLine(p.status === 'Aprovado')}
-          ${trackStep(p.status === 'Aprovado' ? 'done' : 'wait', '✓', 'Aprovado')}
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Fechar</button></div>
-  `;
-  openModal();
-}
-
 function openAnalystModal(idx) {
   const p = processes[idx];
   document.getElementById('modal-inner').innerHTML = `
@@ -1009,30 +509,21 @@ function analystAction(action, idx) {
   const obs = document.getElementById('obs-input')?.value || '';
   processes[idx].obs = obs;
   const p = processes[idx];
-  const ts = new Date().toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
 
   const map = {
-    approve:    { icon:'✅', title:'Processo aprovado',   type:'success', status:'Aprovado',     toast:'Processo aprovado! Empresa notificada.', msg:`Processo ${p.id} (${p.empresa}) foi aprovado pela analista Dra. Carla Mendes. Seu alvará sanitário está disponível.` },
-    correction: { icon:'⚠️', title:'Correção necessária', type:'warn',    status:'Ag. correção', toast:'Correção solicitada. Empresa notificada.', msg:`Processo ${p.id}: Correção solicitada. Motivo: ${obs || 'Documentação incompleta.'}` },
-    vistoria:   { icon:'📅', title:'Vistoria agendada',   type:'info',    status:'Em análise',   toast:'Vistoria agendada. Empresa notificada.', msg:`Uma vistoria foi agendada para o processo ${p.id} (${p.empresa}).` },
-    reject:     { icon:'❌', title:'Processo reprovado',  type:'warn',    status:'Com erro',     toast:'Processo reprovado. Empresa notificada.', msg:`Processo ${p.id} foi reprovado. Motivo: ${obs || 'Documentação não atende aos requisitos.'}` },
+    approve:    { status:'Aprovado',     toast:'Processo aprovado! Notificação registrada.', icon:'✅' },
+    correction: { status:'Ag. correção', toast:'Correção solicitada.', icon:'⚠️' },
+    vistoria:   { status:'Em análise',   toast:'Vistoria agendada.', icon:'📅' },
+    reject:     { status:'Com erro',     toast:'Processo reprovado.', icon:'❌' },
   };
 
   const act = map[action];
   if (act) {
     processes[idx].status = act.status;
-    pushUserNotif({ id:Date.now(), icon:act.icon, title:act.title, msg:act.msg, time:ts, type:act.type, read:false, proto:p.id });
     showToast(act.toast, 'success', act.icon);
   }
   closeModal();
   renderAnalystDashboard();
-}
-
-function trackStep(cls, label, text) {
-  return `<div class="track-step"><div class="track-circle ${cls}">${label}</div><div class="track-label">${text}</div></div>`;
-}
-function trackLine(done) {
-  return `<div class="track-line${done ? ' done' : ''}"></div>`;
 }
 
 function openModal()  { document.getElementById('modal').classList.add('open'); }
@@ -1070,23 +561,11 @@ function showToast(msg, type = '', icon = '') {
   t._timer = setTimeout(() => t.classList.remove('show'), 3500);
 }
 
-function maskCNPJ(input) {
-  let v = input.value.replace(/\D/g, '');
-  v = v.replace(/^(\d{2})(\d)/,               '$1.$2');
-  v = v.replace(/^(\d{2})\.(\d{3})(\d)/,      '$1.$2.$3');
-  v = v.replace(/\.(\d{3})(\d)/,              '.$1/$2');
-  v = v.replace(/(\d{4})(\d)/,                '$1-$2');
-  input.value = v;
-}
-
-// Icons
-const svg = (d, w=16, h=16) => `<svg viewBox="0 0 20 20" fill="currentColor" width="${w}" height="${h}"><path d="${d}"/></svg>`;
+const svg  = (d, w=16, h=16) => `<svg viewBox="0 0 20 20" fill="currentColor" width="${w}" height="${h}"><path d="${d}"/></svg>`;
 const svgRule = (d, w=16, h=16) => `<svg viewBox="0 0 20 20" fill="currentColor" width="${w}" height="${h}"><path fill-rule="evenodd" clip-rule="evenodd" d="${d}"/></svg>`;
 
 function iconHome()       { return svgRule('M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h4a1 1 0 001-1v-3h2v3a1 1 0 001 1h4a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'); }
-function iconSend()       { return svg('M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z'); }
 function iconList()       { return svgRule('M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z'); }
-function iconBell()       { return svg('M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z'); }
 function iconCalendar()   { return svgRule('M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z'); }
 function iconChart()      { return svg('M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z'); }
 function iconGear()       { return svgRule('M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z'); }
@@ -1097,4 +576,3 @@ function iconCheckGreen() { return `<svg viewBox="0 0 20 20" fill="currentColor"
 function iconWarn()       { return `<svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" style="color:var(--amber)"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>`; }
 function iconX()          { return `<svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" style="color:var(--red)"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>`; }
 function iconInfo()       { return `<svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>`; }
-function iconAI()         { return `<svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" style="color:var(--violet)"><path fill-rule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clip-rule="evenodd"/></svg>`; }
