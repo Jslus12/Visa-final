@@ -62,7 +62,7 @@ Por fim, o projeto na qual estamos mostrando atualmente, é a versão final do p
 
   <tr>
     <td align="center">Rafael Piasentin</td>
-    <td align="center">Testes & suporte geral no código</td>
+    <td align="center">Testes | Full-Stack</td>
   </tr>
 
   <tr>
