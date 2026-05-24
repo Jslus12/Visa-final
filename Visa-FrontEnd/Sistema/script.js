@@ -21,28 +21,54 @@ const processes = [
    LOGIN
 ══════════════════════════════════════════════ */
 
-function doLogin() {
+async function doLogin() {
+
   const email = document.getElementById('login-email').value.trim();
   const senha = document.getElementById('login-senha').value;
-  const err   = document.getElementById('login-error');
-  const cred  = CREDENTIALS.analyst;
 
-  ['login-email','login-senha'].forEach(id => document.getElementById(id).classList.remove('input-error'));
+  const err = document.getElementById('login-error');
+
   err.textContent = '';
 
   if (!email || !senha) {
     err.textContent = 'Preencha e-mail e senha.';
-    if (!email) document.getElementById('login-email').classList.add('input-error');
-    if (!senha) document.getElementById('login-senha').classList.add('input-error');
     return;
   }
-  if (email !== cred.email || senha !== cred.senha) {
-    err.textContent = 'E-mail ou senha incorretos.';
-    document.getElementById('login-email').classList.add('input-error');
-    document.getElementById('login-senha').classList.add('input-error');
-    return;
+
+  try {
+
+    const resposta = await fetch("http://localhost:8085/api/login", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        email: email,
+        senha: senha
+      })
+
+    });
+
+    const resultado = await resposta.text();
+
+    if (resultado === "LOGIN_OK") {
+
+      setRole();
+
+    } else {
+
+      err.textContent = "E-mail ou senha inválidos.";
+
+    }
+
+  } catch (e) {
+
+    err.textContent = "Erro ao conectar com o servidor.";
+
   }
-  setRole();
 }
 
 
