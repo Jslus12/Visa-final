@@ -36,6 +36,10 @@ Por fim, o projeto na qual estamos mostrando atualmente, é a versão final do p
   - cd e o nome da pasta para entrar <br>
   - cd.. para voltar a pasta anterior <br>
   - sempre dar git pull antes de fazer algo, para evitar conflitos e tals <br>
+  <h3 align="center"><sub> I N F O R M A Ç Õ E S &nbsp; I M P O R T A N T E S</sub></h3>
+  
+
+
 
 <h3 align="center"><sub> N O S S A &nbsp; E Q U I P E</sub></h3>
 
