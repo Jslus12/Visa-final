@@ -1,306 +1,179 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vigilância Sanitária — Licenciamento Sanitário Digital</title>
 
-<title>Vigilância Sanitária — Licenciamento Sanitário Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght=300;400;500;600;700&family=JetBrains+Mono:wght=400;500&display=swap" rel="stylesheet">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-<!-- CSS FLASK -->
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
 <body>
 
-<!-- ═══════════════════════════════════════
-     LOGIN
-═══════════════════════════════════════ -->
 <div id="role-switcher">
+    <div class="rs-bg"></div>
+    <div class="rs-grid"></div>
+    <div class="rs-content">
 
-  <div class="rs-bg"></div>
-  <div class="rs-grid"></div>
-
-  <div class="rs-content">
-
-    <!-- BRAND -->
-    <div class="rs-brand">
-
-      <div class="rs-brand-icon">
-        <svg viewBox="0 0 32 32" fill="none">
-          <path d="M16 3L4 9.5v13L16 29l12-6.5v-13L16 3z"
-                stroke="white"
-                stroke-width="1.5"
-                stroke-linejoin="round"/>
-
-          <path d="M16 3v26M4 9.5l12 6.5 12-6.5"
-                stroke="white"
-                stroke-width="1.5"
-                stroke-linejoin="round"/>
-        </svg>
-      </div>
-
-      <div class="rs-brand-text">
-        <div class="rs-brand-name">
-          Vigilância Sanitária
-        </div>
-
-        <div class="rs-brand-sub">
-          Licenciamento Sanitário Digital · VISA Londrina
-        </div>
-      </div>
-
-    </div>
-
-    <!-- LOGIN BOX -->
-    <div id="login-panel" class="rs-step visible">
-
-      <div class="login-box">
-
-        <div class="login-profile">
-
-          <div class="login-profile-icon">
-            🔎
-          </div>
-
-          <div>
-            <div class="login-role-title">
-              Analista Sanitário
+        <div class="rs-brand">
+            <div class="rs-brand-icon">
+                <svg viewBox="0 0 32 32" fill="none">
+                    <path d="M16 3L4 9.5v13L16 29l12-6.5v-13L16 3z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M16 3v26M4 9.5l12 6.5 12-6.5" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>
             </div>
-
-            <div class="login-role-sub">
-              Painel de análise e aprovação
+            <div class="rs-brand-text">
+                <div class="rs-brand-name">Vigilância Sanitária</div>
+                <div class="rs-brand-sub">Licenciamento Sanitário Digital · VISA Londrina</div>
             </div>
-          </div>
-
         </div>
 
-        <div class="login-divider"></div>
+        <div id="login-panel" class="rs-step visible">
+            <div class="login-box">
+                <div class="login-profile">
+                    <div class="login-profile-icon">🔎</div>
+                    <div>
+                        <div class="login-role-title">Analista Sanitário</div>
+                        <div class="login-role-sub">Painel de análise e aprovação</div>
+                    </div>
+                </div>
 
-        <!-- EMAIL -->
-        <div class="login-field">
+                <div class="login-divider"></div>
 
-          <label class="login-label">
-            E-mail institucional
-          </label>
+                <div class="login-field">
+                    <label class="login-label">E-mail institucional</label>
+                    <div class="login-input-wrap">
+                        <svg class="login-input-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                        </svg>
+                        <input class="login-input" id="login-email" type="email" placeholder="seu@vigilancia.pr.gov.br">
+                    </div>
+                </div>
 
-          <div class="login-input-wrap">
+                <div class="login-field">
+                    <label class="login-label">Senha de acesso</label>
+                    <div class="login-input-wrap">
+                        <svg class="login-input-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <input class="login-input" id="login-senha" type="password" placeholder="••••••••">
+                    </div>
+                </div>
 
-            <svg class="login-input-icon"
-                 viewBox="0 0 20 20"
-                 fill="currentColor">
+                <div class="login-error" id="login-error"></div>
 
-              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                <button class="login-btn" onclick="doLogin()">
+                    <span>Acessar o painel</span>
+                    <svg viewBox="0 0 20 20" fill="currentColor" width="16">
+                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
 
-              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                <div class="login-demo-hint">
+                    <div class="login-demo-label">Credenciais de demonstração</div>
+                    <code>analista@vigilancia.pr / 123456</code>
+                </div>
+            </div>
+        </div>
 
+        <div class="rs-footer-note">
+            <svg viewBox="0 0 16 16" fill="currentColor" width="12">
+                <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3.5a.75.75 0 110 1.5.75.75 0 010-1.5zM7.25 7h1.5v4h-1.5z"/>
             </svg>
-
-            <input
-              class="login-input"
-              id="login-email"
-              type="email"
-              placeholder="seu@vigilancia.pr.gov.br"
-            >
-
-          </div>
-
+            Sistema em ambiente de demonstração. Dados fictícios.
         </div>
-
-        <!-- SENHA -->
-        <div class="login-field">
-
-          <label class="login-label">
-            Senha de acesso
-          </label>
-
-          <div class="login-input-wrap">
-
-            <svg class="login-input-icon"
-                 viewBox="0 0 20 20"
-                 fill="currentColor">
-
-              <path fill-rule="evenodd"
-                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                    clip-rule="evenodd"/>
-
-            </svg>
-
-            <input
-              class="login-input"
-              id="login-senha"
-              type="password"
-              placeholder="••••••••"
-            >
-
-          </div>
-
-        </div>
-
-        <!-- ERROR -->
-        <div class="login-error" id="login-error"></div>
-
-        <!-- BUTTON -->
-        <button class="login-btn" onclick="doLogin()">
-
-          <span>
-            Acessar o painel
-          </span>
-
-          <svg viewBox="0 0 20 20"
-               fill="currentColor"
-               width="16">
-
-            <path fill-rule="evenodd"
-                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                  clip-rule="evenodd"/>
-
-          </svg>
-
-        </button>
-
-        <!-- DEMO -->
-        <div class="login-demo-hint">
-
-          <div class="login-demo-label">
-            Credenciais de demonstração
-          </div>
-
-          <code>
-            analista@vigilancia.pr / 123456
-          </code>
-
-        </div>
-
-      </div>
-
     </div>
-
-    <!-- FOOTER -->
-    <div class="rs-footer-note">
-
-      <svg viewBox="0 0 16 16"
-           fill="currentColor"
-           width="12">
-
-        <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3.5a.75.75 0 110 1.5.75.75 0 010-1.5zM7.25 7h1.5v4h-1.5z"/>
-
-      </svg>
-
-      Sistema em ambiente de demonstração. Dados fictícios.
-
-    </div>
-
-  </div>
-
 </div>
 
-<!-- APP -->
 <div id="app">
-
-  <header class="header">
-
-    <div class="header-brand">
-
-      <div class="header-logo-icon">
-
-        <svg viewBox="0 0 32 32" fill="none">
-
-          <path d="M16 3L4 9.5v13L16 29l12-6.5v-13L16 3z"
-                stroke="white"
-                stroke-width="1.5"
-                stroke-linejoin="round"/>
-
-          <path d="M16 3v26M4 9.5l12 6.5 12-6.5"
-                stroke="white"
-                stroke-width="1.5"
-                stroke-linejoin="round"/>
-
-        </svg>
-
-      </div>
-
-      <div>
-
-        <div class="header-title">
-          Vigilância Sanitária
+    <header class="header">
+        <div class="header-brand">
+            <div class="header-logo-icon">
+                <svg viewBox="0 0 32 32" fill="none">
+                    <path d="M16 3L4 9.5v13L16 29l12-6.5v-13L16 3z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M16 3v26M4 9.5l12 6.5 12-6.5" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div>
+                <div class="header-title">Vigilância Sanitária</div>
+                <div class="header-sub">Painel do Analista</div>
+            </div>
         </div>
 
-        <div class="header-sub">
-          Painel do Analista
+        <div class="header-center">Vigilância Sanitária — Painel de Controle</div>
+
+        <div class="header-right">
+            <div class="header-user-block">
+                <div class="header-avatar">CM</div>
+                <div class="header-user-info">
+                    <div class="header-username">Dra. Carla Mendes</div>
+                    <span class="header-role-badge badge-analyst">Analista</span>
+                </div>
+            </div>
+            <button class="switch-btn" onclick="switchRole()">Sair</button>
         </div>
+    </header>
 
-      </div>
-
+    <div class="app-body">
+        <nav class="sidebar" id="sidebar"></nav>
+        <main class="content" id="content"></main>
     </div>
-
-    <div class="header-center">
-      Vigilância Sanitária — Painel de Controle
-    </div>
-
-    <div class="header-right">
-
-      <div class="header-user-block">
-
-        <div class="header-avatar">
-          CM
-        </div>
-
-        <div class="header-user-info">
-
-          <div class="header-username">
-            Dra. Carla Mendes
-          </div>
-
-          <span class="header-role-badge badge-analyst">
-            Analista
-          </span>
-
-        </div>
-
-      </div>
-
-      <button class="switch-btn" onclick="switchRole()">
-        Sair
-      </button>
-
-    </div>
-
-  </header>
-
-  <div class="app-body">
-
-    <nav class="sidebar" id="sidebar"></nav>
-
-    <main class="content" id="content"></main>
-
-  </div>
-
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast">
-
-  <span class="toast-icon" id="toast-icon"></span>
-
-  <span id="toast-msg"></span>
-
+    <span class="toast-icon" id="toast-icon"></span>
+    <span id="toast-msg"></span>
 </div>
 
-<!-- MODAL -->
 <div class="modal-overlay" id="modal">
-
-  <div class="modal" id="modal-inner"></div>
-
+    <div class="modal" id="modal-inner"></div>
 </div>
 
-<!-- JS FLASK -->
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 
+<script>
+function doLogin() {
+    const emailInput = document.getElementById('login-email').value;
+    const senhaInput = document.getElementById('login-senha').value;
+    const errorDiv = document.getElementById('login-error');
+    
+    if (errorDiv) errorDiv.textContent = '';
+
+    const dadosLogin = {
+        email: emailInput,
+        senha: senhaInput
+    };
+
+    fetch('http://localhost:8085/api/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dadosLogin)
+    })
+    .then(response => response.text())
+    .then(resultado => {
+        if (resultado === "LOGIN_OK") {
+            setRole(); // Função que está dentro do script.js para montar o painel
+        } else {
+            if (errorDiv) {
+                errorDiv.textContent = "E-mail institucional ou senha incorretos.";
+                errorDiv.style.display = 'block';
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Erro na requisição:', error);
+        if (errorDiv) {
+            errorDiv.textContent = "Não foi possível conectar ao servidor backend.";
+            errorDiv.style.display = 'block';
+        }
+    });
+}
+</script>
 </body>
 </html>
