@@ -4,18 +4,24 @@
    VIGILÂNCIANET — Application Logic (Analista)
 ══════════════════════════════════════════════ */
 
+<<<<<<< HEAD
 const CREDENTIALS = {
   analyst: { email: 'analista@vigilancia.pr', senha: '123456' },
 };
 
 const processes = [
   { id: '#2026-00123', empresa: 'Restaurante Sabor Ltda',  cnpj: '12.345.678/0001-90', status: 'Aprovado',     ia: 'Válida',   data: '08/04/2026', analista: 'Dra. Carla M.', tipo: 'Alvará Sanitário', docs: { alvara:'ok',  tecnico:'ok',   licenca:'ok'  }, obs: '' },
+=======
+const processes = [
+  { id: '#2026-00123', empresa: 'Restaurante Sabor Ltda',   cnpj: '12.345.678/0001-90', status: 'Aprovado',     ia: 'Válida',   data: '08/04/2026', analista: 'Dra. Carla M.', tipo: 'Alvará Sanitário', docs: { alvara:'ok',  tecnico:'ok',   licenca:'ok'  }, obs: '' },
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
   { id: '#2026-00124', empresa: 'Mercado Bom Preço',       cnpj: '98.765.432/0001-19', status: 'Em análise',   ia: 'Válida',   data: '09/04/2026', analista: 'Dr. Bruno R.',  tipo: 'Renovação',       docs: { alvara:'ok',  tecnico:'warn', licenca:'ok'  }, obs: 'Documento técnico com campo responsável incompleto.' },
   { id: '#2026-00125', empresa: 'Padaria Doce Pão',        cnpj: '11.222.333/0001-81', status: 'Com erro',     ia: 'Válida',   data: '10/04/2026', analista: 'Dra. Carla M.', tipo: 'Novo',            docs: { alvara:'err', tecnico:'ok',   licenca:'ok'  }, obs: 'Alvará anterior com data de validade expirada.' },
   { id: '#2026-00126', empresa: 'Clínica Saúde+',          cnpj: '44.555.888/0001-28', status: 'Ag. correção', ia: 'Inválida', data: '11/04/2026', analista: 'Dr. Bruno R.',  tipo: 'Renovação',       docs: { alvara:'ok',  tecnico:'err',  licenca:'ok'  }, obs: 'Responsável técnico não está cadastrado no CRM.' },
   { id: '#2026-00127', empresa: 'Farmácia Vida',           cnpj: '77.888.999/0001-38', status: 'Aprovado',     ia: 'Válida',   data: '12/04/2026', analista: 'Dra. Carla M.', tipo: 'Alvará Sanitário', docs: { alvara:'ok',  tecnico:'ok',   licenca:'ok'  }, obs: '' },
 ];
 
+<<<<<<< HEAD
 
 /* ══════════════════════════════════════════════
    LOGIN
@@ -72,6 +78,8 @@ async function doLogin() {
 }
 
 
+=======
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
 /* ══════════════════════════════════════════════
    APP SETUP
 ══════════════════════════════════════════════ */
@@ -88,7 +96,10 @@ function switchRole() {
   document.getElementById('login-email').value = '';
   document.getElementById('login-senha').value = '';
   document.getElementById('login-error').textContent = '';
+<<<<<<< HEAD
   ['login-email','login-senha'].forEach(id => document.getElementById(id).classList.remove('input-error'));
+=======
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
 }
 
 function renderApp() {
@@ -96,7 +107,10 @@ function renderApp() {
   renderAnalystDashboard();
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
 /* ══════════════════════════════════════════════
    SIDEBAR
 ══════════════════════════════════════════════ */
@@ -107,7 +121,11 @@ function renderSidebar() {
     { icon: iconSend(),     label: 'Novo Protocolo',   page: 'analyst-new' },
     { icon: iconList(),     label: 'Processos',        page: 'analyst-processes', badge: '3' },
     { icon: iconCalendar(), label: 'Vistorias',        page: 'analyst-vistorias' },
+<<<<<<< HEAD
     { icon: iconChart(),    label: 'Relatórios',       page: 'analyst-reports' },
+=======
+    { icon: iconChart(),     label: 'Relatórios',       page: 'analyst-reports' },
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
     { icon: iconGear(),     label: 'Configurações',    page: 'analyst-config' },
   ];
 
@@ -131,12 +149,18 @@ function navTo(page, btn) {
     'analyst-processes':  renderAnalystProcesses,
     'analyst-vistorias':  renderAnalystVistorias,
     'analyst-reports':    renderAnalystReports,
+<<<<<<< HEAD
     'analyst-config':     renderAnalystConfig,
+=======
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
   };
   if (pages[page]) pages[page]();
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
 /* ══════════════════════════════════════════════
    DASHBOARD
 ══════════════════════════════════════════════ */
@@ -173,7 +197,11 @@ function renderAnalystDashboard() {
         </div>
         <div class="card-body">
           <div class="progress-bar" style="margin-bottom:8px"><div class="progress-fill blue" style="width:64%"></div></div>
+<<<<<<< HEAD
           <div style="font-size:12px;color:var(--gray-400)">Meta: <strong>≤ 5 dias úteis</strong> · Dentro do prazo</div>
+=======
+          <div style="font-size:12px;color:var(--gray-400)">Meta: <strong>&le; 5 dias úteis</strong> · Dentro do prazo</div>
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
         </div>
       </div>
     </div>
@@ -204,9 +232,14 @@ function renderAnalystDashboard() {
   `;
 }
 
+<<<<<<< HEAD
 
 /* ══════════════════════════════════════════════
    NOVO PROTOCOLO (trazido do módulo do cliente)
+=======
+/* ══════════════════════════════════════════════
+   NOVO PROTOCOLO
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
 ══════════════════════════════════════════════ */
 
 function renderAnalystNew() {
@@ -230,6 +263,7 @@ function renderAnalystNew() {
             <input class="form-input" placeholder="00.000.000/0000-00" id="cnpj" oninput="maskCNPJ(this)">
           </div>
         </div>
+<<<<<<< HEAD
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Responsável Técnico <span class="required">*</span></label>
@@ -256,6 +290,8 @@ function renderAnalystNew() {
             <input class="form-input" placeholder="empresa@email.com">
           </div>
         </div>
+=======
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
       </div>
     </div>
 
@@ -267,6 +303,7 @@ function renderAnalystNew() {
         ${uploadZone('licenca', '🏥', 'Licença Sanitária', 'PDF, máx. 5MB')}
       </div>
     </div>
+<<<<<<< HEAD
 
     <div class="card" id="ai-validation-card" style="margin-bottom:16px;display:none">
       <div class="card-header">
@@ -301,6 +338,8 @@ function renderAnalystNew() {
       <button class="btn btn-ghost" onclick="navTo('analyst-dashboard', document.querySelector('[data-page=analyst-dashboard]'))">Cancelar</button>
       <button class="btn btn-primary" onclick="submitProcess()">${iconSend()} Enviar para Análise</button>
     </div>
+=======
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
   `;
 }
 
@@ -311,11 +350,16 @@ function uploadZone(type, emoji, label, hint) {
       <div class="upload-icon doc">${emoji}</div>
       <div><div class="upload-name">${label}</div><div class="upload-hint">${hint}</div></div>
     </div>
+<<<<<<< HEAD
     <button class="btn btn-ghost btn-sm" type="button" onclick="event.stopPropagation()">${iconUpload()} Selecionar</button>
+=======
+    <button class="btn btn-ghost btn-sm" type="button">${iconUpload()} Selecionar</button>
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
   </div>`;
 }
 
 function handleFileInput(e, type) {
+<<<<<<< HEAD
   e.stopPropagation();
   const file = e.target.files[0];
   if (!file) return;
@@ -375,10 +419,17 @@ function submitProcess() {
     if (tc2) tc2.className = 'track-circle done';
     if (tl1) tl1.classList.add('done');
   }, 500);
+=======
+  const file = e.target.files[0];
+  if (!file) return;
+  const zone = document.getElementById('zone-' + type);
+  zone.classList.add('has-file');
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
 }
 
 function maskCNPJ(input) {
   let v = input.value.replace(/\D/g, '');
+<<<<<<< HEAD
   v = v.replace(/^(\d{2})(\d)/,               '$1.$2');
   v = v.replace(/^(\d{2})\.(\d{3})(\d)/,      '$1.$2.$3');
   v = v.replace(/\.(\d{3})(\d)/,              '.$1/$2');
@@ -387,6 +438,15 @@ function maskCNPJ(input) {
 }
 
 
+=======
+  v = v.replace(/^(\d{2})(\d)/, '$1.$2');
+  v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+  v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
+  v = v.replace(/(\d{4})(\d)/, '$1-$2');
+  input.value = v;
+}
+
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
 /* ══════════════════════════════════════════════
    PROCESSOS
 ══════════════════════════════════════════════ */
@@ -397,6 +457,7 @@ function renderAnalystProcesses() {
       <div class="page-title">Lista de Processos</div>
       <div class="page-sub">Gerencie todos os processos ativos.</div>
     </div>
+<<<<<<< HEAD
     <div class="card" style="margin-bottom:16px">
       <div class="card-body" style="display:flex;gap:12px;align-items:center">
         <input class="form-input" style="max-width:300px" placeholder="🔍 Buscar empresa, CNPJ ou protocolo…" oninput="filterTable(this.value, null)">
@@ -406,10 +467,13 @@ function renderAnalystProcesses() {
         </select>
       </div>
     </div>
+=======
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
     <div class="card">
       <div class="card-body" style="padding:0">
         <div class="table-wrap">
           <table>
+<<<<<<< HEAD
             <thead><tr><th>Protocolo</th><th>Empresa</th><th>CNPJ</th><th>Tipo</th><th>Data</th><th>Status</th><th>IA</th><th>Analista</th><th>Ação</th></tr></thead>
             <tbody id="ptbody">
               ${processes.map((p, i) => `<tr data-empresa="${p.empresa.toLowerCase()}" data-id="${p.id.toLowerCase()}" data-status="${p.status}">
@@ -421,6 +485,18 @@ function renderAnalystProcesses() {
                 <td>${statusBadge(p.status)}</td>
                 <td>${iaBadge(p.ia)}</td>
                 <td style="font-size:12px;color:var(--gray-500)">${p.analista}</td>
+=======
+            <thead><tr><th>Protocolo</th><th>Empresa</th><th>CNPJ</th><th>Tipo</th><th>Data</th><th>Status</th><th>IA</th><th>Ação</th></tr></thead>
+            <tbody id="ptbody">
+              ${processes.map((p, i) => `<tr>
+                <td><code class="proto">${p.id}</code></td>
+                <td style="font-weight:500">${p.empresa}</td>
+                <td style="color:var(--gray-400);font-size:12px">${p.cnpj}</td>
+                <td>${p.tipo}</td>
+                <td>${p.data}</td>
+                <td>${statusBadge(p.status)}</td>
+                <td>${iaBadge(p.ia)}</td>
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
                 <td><button class="btn btn-primary btn-sm" onclick="openAnalystModal(${i})">Abrir</button></td>
               </tr>`).join('')}
             </tbody>
@@ -431,6 +507,7 @@ function renderAnalystProcesses() {
   `;
 }
 
+<<<<<<< HEAD
 let _searchVal = '', _statusVal = '';
 function filterTable(search, status) {
   if (search !== null) _searchVal = search.toLowerCase();
@@ -443,12 +520,15 @@ function filterTable(search, status) {
 }
 
 
+=======
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
 /* ══════════════════════════════════════════════
    VISTORIAS
 ══════════════════════════════════════════════ */
 
 function renderAnalystVistorias() {
   const vistorias = [
+<<<<<<< HEAD
     { data:'15/04/2026', hora:'09:00', empresa:'Restaurante Sabor Ltda', end:'Rua das Flores, 123 — Centro',  analista:'Dra. Carla M.' },
     { data:'17/04/2026', hora:'14:00', empresa:'Farmácia Vida',          end:'Av. Brasil, 456 — Zona Norte',  analista:'Dr. Bruno R.' },
     { data:'22/04/2026', hora:'10:30', empresa:'Clínica Saúde+',         end:'Rua São Paulo, 789 — Zona Sul', analista:'Dra. Carla M.' },
@@ -475,16 +555,29 @@ function renderAnalystVistorias() {
           <button class="btn btn-ghost btn-sm">Ver detalhes</button>
         </div>`;
       }).join('')}
+=======
+    { data:'15/04/2026', hora:'09:00', empresa:'Restaurante Sabor Ltda', end:'Rua das Flores, 123 — Centro' },
+    { data:'17/04/2026', hora:'14:00', empresa:'Farmácia Vida',          end:'Av. Brasil, 456 — Zona Norte' }
+  ];
+  document.getElementById('content').innerHTML = `
+    <div class="page-header"><div class="page-title">Vistorias Agendadas</div></div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      ${vistorias.map(v => `<div class="card" style="padding:16px"><strong>${v.empresa}</strong> - ${v.end} (${v.hora})</div>`).join('')}
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
     </div>
   `;
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
 /* ══════════════════════════════════════════════
    RELATÓRIOS
 ══════════════════════════════════════════════ */
 
 function renderAnalystReports() {
+<<<<<<< HEAD
   const byStatus = {
     Aprovado:      processes.filter(p => p.status === 'Aprovado').length,
     Pendente:      processes.filter(p => p.status === 'Pendente').length,
@@ -514,11 +607,18 @@ function renderAnalystReports() {
       <div class="metric green"><div class="metric-label">✓ Aprovação</div><div class="metric-value">73%</div><div class="metric-sub">meta: 80%</div></div>
       <div class="metric amber"><div class="metric-label">⏱ Tempo médio</div><div class="metric-value">3.2d</div><div class="metric-sub">meta: ≤5 dias</div></div>
       <div class="metric red"><div class="metric-label">⚠ Taxa erro</div><div class="metric-value">18%</div><div class="metric-sub">doc. rejeitados</div></div>
+=======
+  document.getElementById('content').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Relatórios</div>
+      <div class="page-sub">Análise consolidada dos processos sanitários.</div>
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
     </div>
     <div class="grid-2" style="margin-bottom:16px">
       <div class="card">
         <div class="card-header"><div class="card-title">Por status</div><div class="card-sub">Distribuição atual</div></div>
         <div class="card-body">
+<<<<<<< HEAD
           <canvas id="chart-status" width="300" height="220"></canvas>
           <div class="chart-legend" id="status-legend"></div>
         </div>
@@ -652,12 +752,16 @@ function renderAnalystConfig() {
         </div>
         <div style="margin-top:8px">
           <button class="btn btn-primary" onclick="showToast('Configurações salvas!','success','✅')">Salvar alterações</button>
+=======
+          <canvas id="chart-status"></canvas>
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
         </div>
       </div>
     </div>
   `;
 }
 
+<<<<<<< HEAD
 
 /* ══════════════════════════════════════════════
    MODAL DO ANALISTA
@@ -772,3 +876,22 @@ function iconWarn()       { return `<svg viewBox="0 0 20 20" fill="currentColor"
 function iconX()          { return `<svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" style="color:var(--red)"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>`; }
 function iconInfo()       { return `<svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>`; }
 function iconAI()         { return `<svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" style="color:var(--violet)"><path fill-rule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clip-rule="evenodd"/></svg>`; }
+=======
+/* ══════════════════════════════════════════════
+   FUNÇÕES AUXILIARES / BADGES / ÍCONES
+══════════════════════════════════════════════ */
+
+function statusBadge(status) { return `<span class="badge">${status}</span>`; }
+function iaBadge(ia) { return `<span class="badge ia">${ia}</span>`; }
+function openAnalystModal(i) { alert("Abrindo processo de índice: " + i); }
+function showToast(msg) { alert(msg); }
+
+function iconHome() { return '🏠'; }
+function iconSend() { return '🚀'; }
+function iconList() { return '📋'; }
+function iconCalendar() { return '📅'; }
+function iconChart() { return '📊'; }
+function iconGear() { return '⚙️'; }
+function iconUser() { return '👤'; }
+function iconUpload() { return '📤'; }
+>>>>>>> c32a22ba3d578f820f068c5922fcde1f4e08ea26
