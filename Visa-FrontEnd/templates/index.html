@@ -134,47 +134,5 @@
 </div>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-<script>
-function doLogin() {
-    const emailInput = document.getElementById('login-email').value;
-    const senhaInput = document.getElementById('login-senha').value;
-    const errorDiv = document.getElementById('login-error');
-    
-    if (errorDiv) errorDiv.textContent = '';
-
-    const dadosLogin = {
-        email: emailInput,
-        senha: senhaInput
-    };
-
-    fetch('http://localhost:8085/api/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(dadosLogin)
-    })
-    .then(response => response.text())
-    .then(resultado => {
-        if (resultado === "LOGIN_OK") {
-            setRole(); // Função que está dentro do script.js para montar o painel
-        } else {
-            if (errorDiv) {
-                errorDiv.textContent = "E-mail institucional ou senha incorretos.";
-                errorDiv.style.display = 'block';
-            }
-        }
-    })
-    .catch(error => {
-        console.error('Erro na requisição:', error);
-        if (errorDiv) {
-            errorDiv.textContent = "Não foi possível conectar ao servidor backend.";
-            errorDiv.style.display = 'block';
-        }
-    });
-}
-</script>
 </body>
 </html>
