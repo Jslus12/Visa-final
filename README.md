@@ -3,7 +3,7 @@
 </div>
 
 <div align="center">
-<div align="center">Descrição</div>
+  <h3 align="center"><sub> D E S C R I Ç Ã O &nbsp;</sub></h3>
   O protótipo VISA funcional, é um projeto não aberto ao público criado por estudantes da faculdade de ADS da Unicesumar Londrina/PR.
 O projeto consiste em um sistema integrado a IA que, otimiza mão de obra e praticamente extingue os erros causados por quaisquer que sejam as circunstâncias já que, o módulo do projeto VISA é gerenciado por um agente de inteligência artificial, eliminando as margens de erro em relação a análise documental.
 Por fim, o projeto na qual estamos mostrando atualmente, é a versão final do projeto.
@@ -36,10 +36,6 @@ Por fim, o projeto na qual estamos mostrando atualmente, é a versão final do p
   - cd e o nome da pasta para entrar <br>
   - cd.. para voltar a pasta anterior <br>
   - sempre dar git pull antes de fazer algo, para evitar conflitos e tals <br>
-  <h3 align="center"><sub> I N F O R M A Ç Õ E S &nbsp; I M P O R T A N T E S</sub></h3>
-  
-
-
 
 <h3 align="center"><sub> N O S S A &nbsp; E Q U I P E</sub></h3>
 
