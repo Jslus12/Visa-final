@@ -310,6 +310,7 @@ function uploadZone(type, emoji, label, hint) {
   </div>`;
 }
 
+// refactor: handleFileInput agora dispara validação real via backend
 function handleFileInput(e, type) {
   e.stopPropagation();
   const file = e.target.files[0];
@@ -323,7 +324,57 @@ function handleFileInput(e, type) {
     <div><div class="upload-name">${file.name}</div><div class="upload-hint">${(file.size / 1024).toFixed(0)} KB · Enviado</div></div>
   `;
   zone.querySelector('button').innerHTML = '✓ Carregado';
-  runAIValidation();
+  runAIValidationReal();
+}
+
+// feat: envia os PDFs para o backend e exibe análise da IA
+async function runAIValidationReal() {
+  const card = document.getElementById('ai-validation-card');
+  card.style.display = '';
+  document.getElementById('ai-loading').style.display = '';
+  document.getElementById('ai-results').innerHTML =
+    '<div style="color:var(--gray-400);font-size:13px;padding:4px 0">Analisando documentos com IA…</div>';
+
+  const form = new FormData();
+  const uploads = window._uploads || {};
+  for (const [campo, arquivo] of Object.entries(uploads)) {
+    form.append(campo, arquivo);
+  }
+
+  try {
+    const resp = await fetch('http://localhost:8080/api/validar-docs', {
+      method: 'POST',
+      body: form
+    });
+    const data = await resp.json();
+    document.getElementById('ai-loading').style.display = 'none';
+    renderAIResults(data);
+  } catch (err) {
+    document.getElementById('ai-loading').style.display = 'none';
+    document.getElementById('ai-results').innerHTML =
+      '<div style="color:var(--red);font-size:13px">Erro ao conectar com o servidor de IA.</div>';
+  }
+}
+
+// feat: renderiza resultado da IA no card de validação
+function renderAIResults(data) {
+  const nomes = { alvara: 'Alvará Anterior', tecnico: 'Documento Técnico', licenca: 'Licença Sanitária' };
+  let rows = '';
+
+  for (const [campo, info] of Object.entries(data.documentos || {})) {
+    rows += aiRow(info.status, nomes[campo] || campo, info.mensagem);
+  }
+
+  if (data.coerencia) {
+    rows += aiRow(data.coerencia.status, 'Coerência entre documentos', data.coerencia.mensagem);
+  }
+
+  document.getElementById('ai-results').innerHTML = `
+    <div class="ai-box">
+      <div class="ai-header">${iconAI()} <span class="ai-title">Resultado da Validação — ${data.resumo || ''}</span></div>
+      ${rows}
+    </div>
+  `;
 }
 
 function runAIValidation() {
