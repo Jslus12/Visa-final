@@ -6,3 +6,4 @@ pdfplumber
 peewee
 psycopg2-binary
 werkzeug
+gunicorn

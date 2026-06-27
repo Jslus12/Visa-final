@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
 from flask_cors import CORS
 from dotenv import load_dotenv
 from werkzeug.security import check_password_hash
@@ -18,7 +18,16 @@ template_dir = os.path.abspath(os.path.join(BASE_DIR, '../Visa-FrontEnd/template
 static_dir   = os.path.abspath(os.path.join(BASE_DIR, '../Visa-FrontEnd/static'))
 
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
-CORS(app)
+
+# SECRET_KEY assina o cookie de sessão. Em produção, defina essa variável de
+# ambiente com um valor aleatório e secreto (nunca deixe o valor padrão).
+app.secret_key = os.environ.get("SECRET_KEY", "troque-essa-chave-antes-de-publicar")
+
+# Em produção (HTTPS), o cookie de sessão só é enviado em conexões seguras.
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = os.environ.get("FLASK_ENV") == "production"
+
+CORS(app, supports_credentials=True)
 
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
@@ -39,7 +48,21 @@ def _fechar_conexao(exc):
 
 
 # ══════════════════════════════════════════════
-# LOGIN — agora validado contra a tabela usuarios
+# PROTEÇÃO DE SESSÃO
+# Rotas que exigem login: tudo em /api/, exceto /api/login
+# ══════════════════════════════════════════════
+ROTAS_PUBLICAS = {'/api/login'}
+
+
+@app.before_request
+def _exigir_login_nas_rotas_protegidas():
+    if request.path.startswith('/api/') and request.path not in ROTAS_PUBLICAS:
+        if not session.get('usuario_id'):
+            return jsonify({'erro': 'Não autenticado. Faça login novamente.'}), 401
+
+
+# ══════════════════════════════════════════════
+# LOGIN — validado contra a tabela usuarios; cria sessão no login
 # ══════════════════════════════════════════════
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -49,12 +72,28 @@ def login():
 
     usuario = Usuario.get_or_none(Usuario.email == email)
     if usuario and check_password_hash(usuario.senha_hash, senha):
+        session['usuario_id'] = usuario.id
+        session['usuario_email'] = usuario.email
         return 'LOGIN_OK', 200
     return 'LOGIN_FAIL', 401
 
 
+@app.route('/api/logout', methods=['POST'])
+def logout():
+    session.clear()
+    return '', 204
+
+
+@app.route('/api/me', methods=['GET'])
+def me():
+    usuario = Usuario.get_or_none(Usuario.id == session.get('usuario_id'))
+    if not usuario:
+        return jsonify({'erro': 'Não autenticado'}), 401
+    return jsonify({'nome': usuario.nome, 'email': usuario.email, 'papel': usuario.papel})
+
+
 # ══════════════════════════════════════════════
-# PROCESSOS — substitui o array fixo do script.js
+# PROCESSOS
 # ══════════════════════════════════════════════
 def serializar_processo(p: Processo) -> dict:
     return {
@@ -99,7 +138,8 @@ def criar_processo():
     if not empresa or not cnpj:
         return jsonify({'erro': 'Nome da empresa e CNPJ são obrigatórios.'}), 400
 
-    ultimo = Processo.select().order_by(Processo.id.desc()).first()
+    analista = Usuario.get_or_none(Usuario.id == session.get('usuario_id'))
+
     proximo_num = 123 + Processo.select().count()
     ano = date.today().year
     protocolo = f'#{ano}-{proximo_num:05d}'
@@ -111,13 +151,13 @@ def criar_processo():
         tipo=data.get('tipo', 'Novo'),
         status='Em análise',
         ia_status='Pendente',
+        analista=analista,
     )
     return jsonify(serializar_processo(processo)), 201
 
 
 # ══════════════════════════════════════════════
-# VALIDAÇÃO POR IA — mesma lógica de antes, agora
-# também grava o resultado na tabela documentos
+# VALIDAÇÃO POR IA
 # ══════════════════════════════════════════════
 @app.route('/api/validar-docs', methods=['POST'])
 def validar_docs():
@@ -153,7 +193,6 @@ def validar_docs():
         resposta_texto = response.choices[0].message.content
         resultado = _parsear_resposta(resposta_texto, textos)
 
-        # se o front mandar o protocolo do processo, persistimos o resultado
         protocolo = request.form.get('processo_id')
         if protocolo:
             _salvar_resultado_no_processo(protocolo, resultado, arquivos)
@@ -258,4 +297,5 @@ def home():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080)
+    porta = int(os.environ.get("PORT", 8080))
+    app.run(debug=os.environ.get("FLASK_ENV") != "production", host='0.0.0.0', port=porta)
