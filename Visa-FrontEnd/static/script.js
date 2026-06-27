@@ -4,17 +4,19 @@
    VIGILÂNCIANET — Application Logic (Analista)
 ══════════════════════════════════════════════ */
 
+const API_BASE = 'http://localhost:8080';
+
 const CREDENTIALS = {
   analyst: { email: 'analista@vigilancia.pr', senha: '123456' },
 };
 
-const processes = [
-  { id: '#2026-00123', empresa: 'Restaurante Sabor Ltda',  cnpj: '12.345.678/0001-90', status: 'Aprovado',     ia: 'Válida',   data: '08/04/2026', analista: 'Dra. Carla M.', tipo: 'Alvará Sanitário', docs: { alvara:'ok',  tecnico:'ok',   licenca:'ok'  }, obs: '' },
-  { id: '#2026-00124', empresa: 'Mercado Bom Preço',       cnpj: '98.765.432/0001-19', status: 'Em análise',   ia: 'Válida',   data: '09/04/2026', analista: 'Dr. Bruno R.',  tipo: 'Renovação',       docs: { alvara:'ok',  tecnico:'warn', licenca:'ok'  }, obs: 'Documento técnico com campo responsável incompleto.' },
-  { id: '#2026-00125', empresa: 'Padaria Doce Pão',        cnpj: '11.222.333/0001-81', status: 'Com erro',     ia: 'Válida',   data: '10/04/2026', analista: 'Dra. Carla M.', tipo: 'Novo',            docs: { alvara:'err', tecnico:'ok',   licenca:'ok'  }, obs: 'Alvará anterior com data de validade expirada.' },
-  { id: '#2026-00126', empresa: 'Clínica Saúde+',          cnpj: '44.555.888/0001-28', status: 'Ag. correção', ia: 'Inválida', data: '11/04/2026', analista: 'Dr. Bruno R.',  tipo: 'Renovação',       docs: { alvara:'ok',  tecnico:'err',  licenca:'ok'  }, obs: 'Responsável técnico não está cadastrado no CRM.' },
-  { id: '#2026-00127', empresa: 'Farmácia Vida',           cnpj: '77.888.999/0001-38', status: 'Aprovado',     ia: 'Válida',   data: '12/04/2026', analista: 'Dra. Carla M.', tipo: 'Alvará Sanitário', docs: { alvara:'ok',  tecnico:'ok',   licenca:'ok'  }, obs: '' },
-];
+// Os processos agora vêm do backend (Supabase). O array começa vazio
+// e é populado por loadProcesses().
+let processes = [];
+
+// Protocolo do processo sendo criado na tela "Novo Protocolo" — fica null
+// até o usuário clicar em "Enviar para Análise" e o processo ser criado no banco.
+window._currentProcessoId = null;
 
 /* ══════════════════════════════════════════════
    LOGIN
@@ -39,7 +41,7 @@ async function doLogin() {
   }
 
   try {
-    const resposta = await fetch("http://localhost:8080/api/login", {
+    const resposta = await fetch(`${API_BASE}/api/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -67,13 +69,31 @@ async function doLogin() {
 }
 
 /* ══════════════════════════════════════════════
+   PROCESSOS — busca real no backend (Supabase)
+══════════════════════════════════════════════ */
+
+// Busca a lista de processos no backend e atualiza o array local.
+// Retorna true se a busca deu certo, false se falhou (mantém o array anterior).
+async function loadProcesses() {
+  try {
+    const resp = await fetch(`${API_BASE}/api/processos`);
+    if (!resp.ok) throw new Error('Falha ao buscar processos');
+    processes = await resp.json();
+    return true;
+  } catch (e) {
+    console.error('Erro ao carregar processos:', e);
+    return false;
+  }
+}
+
+/* ══════════════════════════════════════════════
    APP SETUP
 ══════════════════════════════════════════════ */
 
-function setRole() {
+async function setRole() {
   document.getElementById('role-switcher').style.display = 'none';
   document.getElementById('app').classList.add('visible');
-  renderApp();
+  await renderApp();
 }
 
 function switchRole() {
@@ -89,9 +109,9 @@ function switchRole() {
   });
 }
 
-function renderApp() {
+async function renderApp() {
   renderSidebar();
-  renderAnalystDashboard();
+  await renderAnalystDashboard();
 }
 
 /* ══════════════════════════════════════════════
@@ -102,7 +122,7 @@ function renderSidebar() {
   const items = [
     { icon: iconHome(),     label: 'Dashboard',        page: 'analyst-dashboard', active: true },
     { icon: iconSend(),     label: 'Novo Protocolo',   page: 'analyst-new' },
-    { icon: iconList(),     label: 'Processos',        page: 'analyst-processes', badge: '3' },
+    { icon: iconList(),     label: 'Processos',        page: 'analyst-processes' },
     { icon: iconCalendar(), label: 'Vistorias',        page: 'analyst-vistorias' },
     { icon: iconChart(),    label: 'Relatórios',       page: 'analyst-reports' },
     { icon: iconGear(),     label: 'Configurações',    page: 'analyst-config' },
@@ -119,7 +139,7 @@ function renderSidebar() {
   document.getElementById('sidebar').innerHTML = html;
 }
 
-function navTo(page, btn) {
+async function navTo(page, btn) {
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   const pages = {
@@ -130,46 +150,61 @@ function navTo(page, btn) {
     'analyst-reports':    renderAnalystReports,
     'analyst-config':     renderAnalystConfig,
   };
-  if (pages[page]) pages[page]();
+  if (pages[page]) await pages[page]();
 }
 
 /* ══════════════════════════════════════════════
    DASHBOARD
 ══════════════════════════════════════════════ */
 
-function renderAnalystDashboard() {
+async function renderAnalystDashboard() {
+  // mostra um estado de carregamento simples enquanto busca o banco
   document.getElementById('content').innerHTML = `
     <div class="page-header">
       <div class="page-title">Dashboard do Analista</div>
-      <div class="page-sub">Visão geral dos processos em andamento — Abril 2026.</div>
+      <div class="page-sub">Carregando dados do banco…</div>
+    </div>`;
+
+  await loadProcesses();
+
+  const total = processes.length;
+  const pendentes = processes.filter(p => p.status === 'Pendente' || p.status === 'Ag. correção').length;
+  const emAnalise = processes.filter(p => p.status === 'Em análise').length;
+  const aprovados = processes.filter(p => p.status === 'Aprovado').length;
+  const comErro   = processes.filter(p => p.status === 'Com erro').length;
+  const taxaAprovacao = total ? Math.round((aprovados / total) * 100) : 0;
+
+  document.getElementById('content').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Dashboard do Analista</div>
+      <div class="page-sub">Visão geral dos processos em andamento — dados em tempo real do banco.</div>
     </div>
 
     <div class="metrics">
-      <div class="metric amber"><div class="metric-label">⏳ Pendentes</div><div class="metric-value">23</div><div class="metric-sub">aguardando análise</div></div>
-      <div class="metric blue"><div class="metric-label">🔍 Em análise</div><div class="metric-value">12</div><div class="metric-sub">em revisão ativa</div></div>
-      <div class="metric green"><div class="metric-label">✓ Aprovados</div><div class="metric-value">45</div><div class="metric-sub">este mês</div></div>
-      <div class="metric red"><div class="metric-label">⚠ Com erro</div><div class="metric-value">8</div><div class="metric-sub">requerem correção</div></div>
+      <div class="metric amber"><div class="metric-label">⏳ Pendentes</div><div class="metric-value">${pendentes}</div><div class="metric-sub">aguardando análise</div></div>
+      <div class="metric blue"><div class="metric-label">🔍 Em análise</div><div class="metric-value">${emAnalise}</div><div class="metric-sub">em revisão ativa</div></div>
+      <div class="metric green"><div class="metric-label">✓ Aprovados</div><div class="metric-value">${aprovados}</div><div class="metric-sub">no total</div></div>
+      <div class="metric red"><div class="metric-label">⚠ Com erro</div><div class="metric-value">${comErro}</div><div class="metric-sub">requerem correção</div></div>
     </div>
 
     <div class="grid-2" style="margin-bottom:16px">
       <div class="card">
         <div class="card-header">
           <div><div class="card-title">Taxa de aprovação</div></div>
-          <span style="font-size:22px;font-weight:700;color:var(--green)">73%</span>
+          <span style="font-size:22px;font-weight:700;color:var(--green)">${taxaAprovacao}%</span>
         </div>
         <div class="card-body">
-          <div class="progress-bar" style="margin-bottom:8px"><div class="progress-fill green" style="width:73%"></div></div>
-          <div style="font-size:12px;color:var(--gray-400)">Meta mensal: <strong>80%</strong> · Restam 7 pontos percentuais</div>
+          <div class="progress-bar" style="margin-bottom:8px"><div class="progress-fill green" style="width:${taxaAprovacao}%"></div></div>
+          <div style="font-size:12px;color:var(--gray-400)">Calculado sobre ${total} processo(s) cadastrado(s)</div>
         </div>
       </div>
       <div class="card">
         <div class="card-header">
-          <div><div class="card-title">Tempo médio de análise</div></div>
-          <span style="font-size:22px;font-weight:700;color:var(--brand)">3.2d</span>
+          <div><div class="card-title">Total de processos</div></div>
+          <span style="font-size:22px;font-weight:700;color:var(--brand)">${total}</span>
         </div>
         <div class="card-body">
-          <div class="progress-bar" style="margin-bottom:8px"><div class="progress-fill blue" style="width:64%"></div></div>
-          <div style="font-size:12px;color:var(--gray-400)">Meta: <strong>&le; 5 dias úteis</strong> · Dentro do prazo</div>
+          <div style="font-size:12px;color:var(--gray-400)">Todos os registros cadastrados no banco de dados</div>
         </div>
       </div>
     </div>
@@ -181,10 +216,11 @@ function renderAnalystDashboard() {
       </div>
       <div class="card-body" style="padding:0">
         <div class="table-wrap">
+          ${total === 0 ? `<div style="padding:22px;color:var(--gray-400);font-size:13px">Nenhum processo cadastrado ainda.</div>` : `
           <table>
             <thead><tr><th>Protocolo</th><th>Empresa</th><th>CNPJ</th><th>Status</th><th>Validação IA</th><th>Ação</th></tr></thead>
             <tbody>
-              ${processes.map((p, i) => `<tr>
+              ${processes.slice(0, 5).map((p, i) => `<tr>
                 <td><code class="proto">${p.id}</code></td>
                 <td style="font-weight:500">${p.empresa}</td>
                 <td style="color:var(--gray-400);font-size:12px;font-family:'JetBrains Mono',monospace">${p.cnpj}</td>
@@ -193,7 +229,7 @@ function renderAnalystDashboard() {
                 <td><button class="btn btn-primary btn-sm" onclick="openAnalystModal(${i})">Abrir</button></td>
               </tr>`).join('')}
             </tbody>
-          </table>
+          </table>`}
         </div>
       </div>
     </div>
@@ -206,6 +242,7 @@ function renderAnalystDashboard() {
 
 function renderAnalystNew() {
   window._uploads = {};
+  window._currentProcessoId = null;
   document.getElementById('content').innerHTML = `
     <div class="page-header">
       <div class="page-title">Novo Protocolo</div>
@@ -310,7 +347,7 @@ function uploadZone(type, emoji, label, hint) {
   </div>`;
 }
 
-// refactor: handleFileInput agora dispara validação real via backend
+// handleFileInput dispara a validação real via backend a cada arquivo selecionado
 function handleFileInput(e, type) {
   e.stopPropagation();
   const file = e.target.files[0];
@@ -324,11 +361,15 @@ function handleFileInput(e, type) {
     <div><div class="upload-name">${file.name}</div><div class="upload-hint">${(file.size / 1024).toFixed(0)} KB · Enviado</div></div>
   `;
   zone.querySelector('button').innerHTML = '✓ Carregado';
-  runAIValidationReal();
+  // nesta etapa o processo ainda não existe no banco, então só mostramos
+  // o resultado da IA sem persistir ainda (sem processoId)
+  runAIValidationReal(null);
 }
 
-// feat: envia os PDFs para o backend e exibe análise da IA
-async function runAIValidationReal() {
+// Envia os PDFs para o backend e exibe a análise da IA.
+// Se processoId for informado, o backend também salva o resultado
+// na tabela "documentos", vinculado a esse processo.
+async function runAIValidationReal(processoId) {
   const card = document.getElementById('ai-validation-card');
   card.style.display = '';
   document.getElementById('ai-loading').style.display = '';
@@ -340,23 +381,28 @@ async function runAIValidationReal() {
   for (const [campo, arquivo] of Object.entries(uploads)) {
     form.append(campo, arquivo);
   }
+  if (processoId) {
+    form.append('processo_id', processoId);
+  }
 
   try {
-    const resp = await fetch('http://localhost:8080/api/validar-docs', {
+    const resp = await fetch(`${API_BASE}/api/validar-docs`, {
       method: 'POST',
       body: form
     });
     const data = await resp.json();
     document.getElementById('ai-loading').style.display = 'none';
     renderAIResults(data);
+    return data;
   } catch (err) {
     document.getElementById('ai-loading').style.display = 'none';
     document.getElementById('ai-results').innerHTML =
       '<div style="color:var(--red);font-size:13px">Erro ao conectar com o servidor de IA.</div>';
+    return null;
   }
 }
 
-// feat: renderiza resultado da IA no card de validação
+// Renderiza o resultado da IA no card de validação
 function renderAIResults(data) {
   const nomes = { alvara: 'Alvará Anterior', tecnico: 'Documento Técnico', licenca: 'Licença Sanitária' };
   let rows = '';
@@ -377,42 +423,48 @@ function renderAIResults(data) {
   `;
 }
 
-function runAIValidation() {
-  const card = document.getElementById('ai-validation-card');
-  card.style.display = '';
-  document.getElementById('ai-loading').style.display = '';
-  document.getElementById('ai-results').innerHTML = '<div style="color:var(--gray-400);font-size:13px;padding:4px 0">Analisando documentos com IA…</div>';
-
-  setTimeout(() => {
-    const ups = window._uploads || {};
-    document.getElementById('ai-loading').style.display = 'none';
-    let rows = '';
-    if (ups.alvara)  rows += aiRow('ok',    'Alvará Anterior',   'Documento identificado e válido. Validade verificada: dez/2026.');
-    else             rows += aiRow('warn',  'Alvará Anterior',   'Documento não enviado ainda.');
-    if (ups.tecnico) rows += aiRow('warn',  'Documento Técnico', 'Campo "Responsável" está incompleto ou ilegível.');
-    else             rows += aiRow('warn',  'Documento Técnico', 'Documento não enviado ainda.');
-    if (ups.licenca) rows += aiRow('ok',    'Licença Sanitária', 'Documento válido, sem inconsistências detectadas.');
-    else             rows += aiRow('error', 'Licença Sanitária', 'Documento obrigatório não enviado.');
-    document.getElementById('ai-results').innerHTML = `
-      <div class="ai-box">
-        <div class="ai-header">${iconAI()} <span class="ai-title">Resultado da Validação Automática</span></div>
-        ${rows}
-      </div>
-    `;
-  }, 1800);
-}
-
 function aiRow(type, label, msg) {
   const cls  = type === 'ok' ? 'ok-item' : type === 'error' ? 'error-item' : 'warn';
   const icon = type === 'ok' ? iconCheckGreen() : type === 'error' ? iconX() : iconWarn();
   return `<div class="ai-item ${cls}">${icon} <div><strong>${label}</strong> — ${msg}</div></div>`;
 }
 
-function submitProcess() {
+// Cria o processo no banco (Supabase) e, se houver documentos enviados,
+// roda a validação de novo já vinculada ao processo, para persistir o resultado.
+async function submitProcess() {
   const nome = document.getElementById('nome-empresa')?.value.trim();
   const cnpj = document.getElementById('cnpj')?.value.trim();
+  const tipo = document.getElementById('tipo-proc')?.value || 'Novo';
+
   if (!nome || !cnpj) { showToast('Preencha os campos obrigatórios.', 'error-t', '⚠️'); return; }
-  showToast('Protocolo #2026-00128 registrado com sucesso!', 'success', '✅');
+
+  let processoCriado;
+  try {
+    const resp = await fetch(`${API_BASE}/api/processos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ empresa: nome, cnpj: cnpj, tipo: tipo })
+    });
+    if (!resp.ok) {
+      const erro = await resp.json().catch(() => ({}));
+      showToast(erro.erro || 'Não foi possível registrar o processo.', 'error-t', '⚠️');
+      return;
+    }
+    processoCriado = await resp.json();
+  } catch (e) {
+    showToast('Erro ao conectar com o servidor.', 'error-t', '⚠️');
+    return;
+  }
+
+  window._currentProcessoId = processoCriado.id;
+  showToast(`Protocolo ${processoCriado.id} registrado com sucesso!`, 'success', '✅');
+
+  // se já tinha documentos enviados, roda a validação de novo, agora persistindo no processo criado
+  const temUploads = window._uploads && Object.keys(window._uploads).length > 0;
+  if (temUploads) {
+    await runAIValidationReal(processoCriado.id);
+  }
+
   setTimeout(() => {
     const tc1 = document.getElementById('tc1');
     const tc2 = document.getElementById('tc2');
@@ -436,11 +488,19 @@ function maskCNPJ(input) {
    PROCESSOS
 ══════════════════════════════════════════════ */
 
-function renderAnalystProcesses() {
+async function renderAnalystProcesses() {
   document.getElementById('content').innerHTML = `
     <div class="page-header">
       <div class="page-title">Lista de Processos</div>
-      <div class="page-sub">Gerencie todos os processos ativos.</div>
+      <div class="page-sub">Carregando dados do banco…</div>
+    </div>`;
+
+  await loadProcesses();
+
+  document.getElementById('content').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Lista de Processos</div>
+      <div class="page-sub">Gerencie todos os processos ativos — dados em tempo real do banco.</div>
     </div>
     <div class="card" style="margin-bottom:16px">
       <div class="card-body" style="display:flex;gap:12px;align-items:center">
@@ -449,10 +509,12 @@ function renderAnalystProcesses() {
           <option value="">Todos os status</option>
           <option>Pendente</option><option>Em análise</option><option>Aprovado</option><option>Com erro</option><option>Ag. correção</option>
         </select>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="navTo('analyst-processes', document.querySelector('[data-page=analyst-processes]'))">↻ Atualizar</button>
       </div>
     </div>
     <div class="card">
       <div class="card-body" style="padding:0">
+        ${processes.length === 0 ? `<div style="padding:22px;color:var(--gray-400);font-size:13px">Nenhum processo cadastrado ainda.</div>` : `
         <div class="table-wrap">
           <table>
             <thead><tr><th>Protocolo</th><th>Empresa</th><th>CNPJ</th><th>Tipo</th><th>Data</th><th>Status</th><th>IA</th><th>Analista</th><th>Ação</th></tr></thead>
@@ -465,12 +527,12 @@ function renderAnalystProcesses() {
                 <td style="font-size:12px">${p.data}</td>
                 <td>${statusBadge(p.status)}</td>
                 <td>${iaBadge(p.ia)}</td>
-                <td style="font-size:12px;color:var(--gray-500)">${p.analista}</td>
+                <td style="font-size:12px;color:var(--gray-500)">${p.analista || '—'}</td>
                 <td><button class="btn btn-primary btn-sm" onclick="openAnalystModal(${i})">Abrir</button></td>
               </tr>`).join('')}
             </tbody>
           </table>
-        </div>
+        </div>`}
       </div>
     </div>
   `;
@@ -485,6 +547,81 @@ function filterTable(search, status) {
     const matchStatus = !_statusVal || r.dataset.status === _statusVal;
     r.style.display = matchSearch && matchStatus ? '' : 'none';
   });
+}
+
+/* ══════════════════════════════════════════════
+   MODAL DE DETALHES DO PROCESSO
+══════════════════════════════════════════════ */
+
+// Busca o detalhe completo do processo (incluindo documentos) no backend e abre o modal.
+async function openAnalystModal(index) {
+  const resumo = processes[index];
+  if (!resumo) return;
+
+  const modalOverlay = document.getElementById('modal');
+  const modalInner = document.getElementById('modal-inner');
+
+  modalInner.innerHTML = `
+    <div class="modal-header">
+      <div class="modal-title">${resumo.id}</div>
+      <button class="modal-close" onclick="closeAnalystModal()">&times;</button>
+    </div>
+    <div class="modal-body"><div style="color:var(--gray-400);font-size:13px">Carregando detalhes…</div></div>
+  `;
+  modalOverlay.classList.add('open');
+
+  try {
+    const resp = await fetch(`${API_BASE}/api/processos/${encodeURIComponent(resumo.id)}`);
+    const detalhe = await resp.json();
+
+    const nomesDoc = { alvara: 'Alvará Anterior', tecnico: 'Documento Técnico', licenca: 'Licença Sanitária' };
+    const docsHtml = (detalhe.documentos && detalhe.documentos.length)
+      ? detalhe.documentos.map(d => aiRow(d.status, nomesDoc[d.tipo] || d.tipo, d.mensagem)).join('')
+      : `<div style="padding:14px 0;color:var(--gray-400);font-size:13px">Nenhum documento analisado ainda para este processo.</div>`;
+
+    modalInner.innerHTML = `
+      <div class="modal-header">
+        <div class="modal-title">${detalhe.id} — ${detalhe.empresa}</div>
+        <button class="modal-close" onclick="closeAnalystModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-panel" style="margin-bottom:20px">
+          <div>
+            <div class="detail-label">Dados do processo</div>
+            <div class="detail-row"><span class="detail-key">CNPJ</span><span class="detail-val">${detalhe.cnpj}</span></div>
+            <div class="detail-row"><span class="detail-key">Tipo</span><span class="detail-val">${detalhe.tipo}</span></div>
+            <div class="detail-row"><span class="detail-key">Analista</span><span class="detail-val">${detalhe.analista || '—'}</span></div>
+          </div>
+          <div>
+            <div class="detail-label">Situação</div>
+            <div class="detail-row"><span class="detail-key">Status</span><span class="detail-val">${statusBadge(detalhe.status)}</span></div>
+            <div class="detail-row"><span class="detail-key">Validação IA</span><span class="detail-val">${iaBadge(detalhe.ia)}</span></div>
+            <div class="detail-row"><span class="detail-key">Data</span><span class="detail-val">${detalhe.data}</span></div>
+          </div>
+        </div>
+        ${detalhe.obs ? `<div class="flag warn" style="margin-bottom:16px">${detalhe.obs}</div>` : ''}
+        <div class="ai-box">
+          <div class="ai-header">${iconAI()} <span class="ai-title">Documentos analisados</span></div>
+          ${docsHtml}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeAnalystModal()">Fechar</button>
+      </div>
+    `;
+  } catch (e) {
+    modalInner.innerHTML = `
+      <div class="modal-header">
+        <div class="modal-title">${resumo.id}</div>
+        <button class="modal-close" onclick="closeAnalystModal()">&times;</button>
+      </div>
+      <div class="modal-body"><div style="color:var(--red);font-size:13px">Erro ao carregar detalhes do processo.</div></div>
+    `;
+  }
+}
+
+function closeAnalystModal() {
+  document.getElementById('modal').classList.remove('open');
 }
 
 /* ══════════════════════════════════════════════
@@ -541,7 +678,23 @@ function iconWarn() { return '⚠️'; }
 
 function statusBadge(status) { return `<span class="badge">${status}</span>`; }
 function iaBadge(ia) { return `<span class="badge-ia">${ia}</span>`; }
-function openAnalystModal(index) { console.log('Abrindo processo: ', index); }
-function showToast(msg, type, icon) { console.log(`${icon} [${type.toUpperCase()}] ${msg}`); }
+function showToast(msg, type, icon) {
+  const toast = document.getElementById('toast');
+  if (!toast) { console.log(`${icon} [${type.toUpperCase()}] ${msg}`); return; }
+  document.getElementById('toast-icon').textContent = icon || '';
+  document.getElementById('toast-msg').textContent = msg;
+  toast.className = `toast show ${type || ''}`;
+  setTimeout(() => { toast.className = 'toast'; }, 3500);
+}
 function renderAnalystReports() { document.getElementById('content').innerHTML = '<h3>Relatórios</h3>'; }
 function renderAnalystConfig() { document.getElementById('content').innerHTML = '<h3>Configurações</h3>'; }
+
+// fecha o modal clicando fora dele (no fundo escurecido)
+document.addEventListener('DOMContentLoaded', () => {
+  const overlay = document.getElementById('modal');
+  if (overlay) {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeAnalystModal();
+    });
+  }
+});
