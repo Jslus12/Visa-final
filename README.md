@@ -10,7 +10,7 @@ Por fim, o projeto na qual estamos mostrando atualmente, é a versão final do p
 </div>
 
 ---
-
+### 
 <div align="center">
   <img src="https://readme-typing-svg.herokuapp.com?font=Cormorant+Garamond&weight=300&size=42&duration=3500&pause=1200&color=F0EDE6&center=true&vCenter=true&width=700&lines=TECNOLOGIAS+USADAS"/>
 </div>
