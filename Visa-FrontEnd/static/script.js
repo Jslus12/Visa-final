@@ -4,7 +4,9 @@
    VIGILÂNCIANET — Application Logic (Analista)
 ══════════════════════════════════════════════ */
 
-const API_BASE = 'http://localhost:8080';
+// Caminho relativo: funciona tanto em localhost quanto já hospedado,
+// porque o Flask serve o front e a API no mesmo domínio.
+const API_BASE = '';
 
 const CREDENTIALS = {
   analyst: { email: 'analista@vigilancia.pr', senha: '123456' },
@@ -68,6 +70,22 @@ async function doLogin() {
   }
 }
 
+// Wrapper simples de fetch que detecta sessão expirada (401) e
+// devolve o usuário pra tela de login automaticamente.
+async function apiFetch(url, options) {
+  const resp = await fetch(url, options);
+  if (resp.status === 401) {
+    switchRole();
+    const err = document.getElementById('login-error');
+    if (err) {
+      err.textContent = 'Sua sessão expirou. Faça login novamente.';
+      err.style.display = 'block';
+    }
+    throw new Error('Sessão expirada');
+  }
+  return resp;
+}
+
 /* ══════════════════════════════════════════════
    PROCESSOS — busca real no backend (Supabase)
 ══════════════════════════════════════════════ */
@@ -76,7 +94,7 @@ async function doLogin() {
 // Retorna true se a busca deu certo, false se falhou (mantém o array anterior).
 async function loadProcesses() {
   try {
-    const resp = await fetch(`${API_BASE}/api/processos`);
+    const resp = await apiFetch(`${API_BASE}/api/processos`);
     if (!resp.ok) throw new Error('Falha ao buscar processos');
     processes = await resp.json();
     return true;
@@ -107,6 +125,8 @@ function switchRole() {
     const el = document.getElementById(id);
     if(el) el.classList.remove('input-error');
   });
+  // encerra a sessão no servidor também (não só visualmente no front)
+  fetch(`${API_BASE}/api/logout`, { method: 'POST' }).catch(() => {});
 }
 
 async function renderApp() {
@@ -386,7 +406,7 @@ async function runAIValidationReal(processoId) {
   }
 
   try {
-    const resp = await fetch(`${API_BASE}/api/validar-docs`, {
+    const resp = await apiFetch(`${API_BASE}/api/validar-docs`, {
       method: 'POST',
       body: form
     });
@@ -440,7 +460,7 @@ async function submitProcess() {
 
   let processoCriado;
   try {
-    const resp = await fetch(`${API_BASE}/api/processos`, {
+    const resp = await apiFetch(`${API_BASE}/api/processos`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ empresa: nome, cnpj: cnpj, tipo: tipo })
@@ -571,7 +591,7 @@ async function openAnalystModal(index) {
   modalOverlay.classList.add('open');
 
   try {
-    const resp = await fetch(`${API_BASE}/api/processos/${encodeURIComponent(resumo.id)}`);
+    const resp = await apiFetch(`${API_BASE}/api/processos/${encodeURIComponent(resumo.id)}`);
     const detalhe = await resp.json();
 
     const nomesDoc = { alvara: 'Alvará Anterior', tecnico: 'Documento Técnico', licenca: 'Licença Sanitária' };
